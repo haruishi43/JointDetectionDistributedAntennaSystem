@@ -31,9 +31,6 @@ Shadowing_ave = 0;                                                          % Sh
 Shadowing_var_Macro = 8;                                                    % MacroBS Shadowingの分散値
 Shadowing_var_Pico = 10;                                                    % PicoBS Shadowingの分散値
 Correlation_jake_coefficient = 0.44;                                        % 相関係数0.5に対応してjakeに入れる係数
-Penetration_loss = 20;                                                      % 透過損失
-Antenna_gain_Macro = 17;                                                    % MacroBSのアンテナ利得
-Antenna_gain_Pico = 5;                                                      % PicoBSのアンテナ利得
 Receiver_noise_density = -174;
 NO_EIRP_base = 1;                                                           % MacroBS放射電力制御係数
 NO_EIRP_picobase = 1;                                                       % PicoBS放射電力制御係数(今は制御していない)
@@ -74,20 +71,21 @@ end
 home = pwd;
 data_root = fullfile(home, data_folder_name);
 
-SINR_SC_user= zeros(NO_user,NO_SC,(NO_cell+1)^NO_user );
+%% More Variables 
+
+SINR_SC_user = zeros(NO_user,NO_SC,(NO_cell+1)^NO_user );
 SINR_SC_user_floor = zeros(NO_user,NO_SC,(NO_cell+1)^NO_user);
 
 EIRP_base = zeros(1,NO_EIRP_base);
 SINR_RB_user = zeros(NO_user,NO_RB,NO_EIRP_base);
 SINR_RB_user_floor = zeros (NO_user,NO_RB,NO_EIRP_base);
 
-% Capacity_ave = 0;                                                         % Capacityの平均を格納
 channel_responce_freq = zeros(NO_user,NO_cell,NO_SC); %
 channel_responce_time_rayleigh = zeros(NO_user,NO_cell,NO_SC); %
 
 Coordinates_table = zeros(floor(IS_distance / 2 / sqrt(3)),floor(IS_distance / 2));  % 座標を作るための表
 Coordinates = zeros(1,NO_user);                                                      % ユーザの座標を格納
-Coordinates_Interference = zeros(1,NO_Interference_cell);                                         % 干渉基地局(Macro)の座標を格納                     
+Coordinates_Interference = zeros(1,NO_Interference_cell);                            % 干渉基地局(Macro)の座標を格納                     
 
 Capacity_byuser_macro_Conv = zeros(NO_user,NO_EIRP_base,NO_drop_trial);
 Capacity_Analyze_Conv = zeros(NO_Analyze,11);     % using                                     
@@ -178,7 +176,7 @@ for Drop_index = 1:NO_drop_trial
        %% Rayleigh Fading付加 %%
         GI = 32;       
         for user_index = 1:NO_user
-            for cell_index = 1:7
+            for cell_index = 1:NO_cell
                 channel_responce_time_rayleigh(user_index,cell_index,1:length(pow_amp)) = (1/sqrt(2).*(randn(1,length(pow_amp))+1j*randn(1,length(pow_amp)))) .* sqrt(Delay_profile);
                 channel_responce_time_rayleigh(user_index,cell_index,7:NO_SC) = zeros(1,1,NO_SC-NO_path);
                 channel_responce_freq(user_index,cell_index,:) = fft(channel_responce_time_rayleigh(user_index,cell_index,:));
@@ -199,7 +197,7 @@ for Drop_index = 1:NO_drop_trial
         Shadowing_correlation_matrix=Shadowing_correlation_matrix*0.5;
         Shadowing=zeros(42,1);
         for BS_index = 1:42
-            Shadowing(BS_index)=Shadowing_var_Pico.*randn(1,1)+Shadowing_ave;
+            Shadowing(BS_index)=Shadowing_var_Pico.*randn(1,1)+Shadowing_ave; % Shadowing_ave is always 0? % Why Shadowing_var_pico
             Shadowing_correlation_matrix(BS_index,BS_index)=1;
         end
         Shadowing_correlation_matrix=sqrtm(Shadowing_correlation_matrix);
