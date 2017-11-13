@@ -18,7 +18,7 @@ Band_RB = 180*10^3;                  % 1RBに使用する周波数帯域
 Band = Band_RB * NO_RB;              % 使用する周波数帯域
 NO_time_trial = 3;                   % 時間の試行回数 (3)
 Timing_interval = 60;                % チャネルを固定するインターバル                                                   
-NO_drop_trial = 300;                % ユーザドロップの試行回数 (1200)
+NO_drop_trial = 1200;                % ユーザドロップの試行回数 (1200)
 TI = 60;                             % Time Interval
 NO_path = 6;                         % Jake'sモデルにおけるパスの数
 % Doppler = 5.55;                      % Jake'sモデルにおけるドップラーシフト値[Hz]
@@ -34,7 +34,6 @@ Shadowing_var_Pico = 10;             % PicoBS Shadowingの分散値
 Receiver_noise_density = -174;
 NO_EIRP_base = 1;                    % MacroBS放射電力制御係数
 % NO_EIRP_picobase = 1;                % PicoBS放射電力制御係数(今は制御していない)
-NO_Analyze = 10000;                  % 解析数
 
 
 %% Saving to Folder %%
@@ -53,7 +52,7 @@ past_throughput = zeros(NO_user, 1);
 % label data:
 combination = zeros(NO_RB, 1);
 % other data:
-sumrate = zeros(1, 1);
+sumrate = 0;
 % which means we get actual_interval as the number of data points per each
 % NO_time_trail
 
@@ -75,7 +74,6 @@ data_root = fullfile(home, data_folder_name);
 
 SINR_SC_user = zeros(NO_user,NO_SC,(NO_cell+1)^NO_user );
 SINR_SC_user_floor = zeros(NO_user,NO_SC,(NO_cell+1)^NO_user);
-
 EIRP_base = zeros(1,NO_EIRP_base);
 SINR_RB_user = zeros(NO_user,NO_RB,NO_EIRP_base);
 SINR_RB_user_floor = zeros (NO_user,NO_RB,NO_EIRP_base);
@@ -86,16 +84,13 @@ channel_responce_time_rayleigh = zeros(NO_user,NO_cell,NO_SC); %
 Coordinates = zeros(1,NO_user);                                                      % ユーザの座標を格納
 % Coordinates_Interference = zeros(1,NO_Interference_cell);                            % 干渉基地局(Macro)の座標を格納                     
 
-Capacity_byuser_macro_Conv = zeros(NO_user,NO_EIRP_base,NO_drop_trial);
-Capacity_Analyze_Conv = zeros(NO_Analyze,11);     % using                                     
+Capacity_byuser_macro_Conv = zeros(NO_user,NO_EIRP_base,NO_drop_trial);                                   
 Delay_profile = zeros(1,NO_path);
-Analyze_index_Conv = 1;
 
 Distance_fromBS = zeros(NO_drop_trial,NO_cell,NO_user);
 Distance_fromBS_pre = zeros(NO_drop_trial,NO_cell,NO_user);
 PLR_fromBS = zeros(NO_drop_trial,NO_cell,NO_user);
 
-%% 追加分 %%
 Signal_power_fromBS_user = zeros(NO_user,NO_SC,NO_EIRP_base,(NO_cell+1)^NO_user);
 Signal_power_fromBS_Interference_user = zeros(NO_user,NO_SC,NO_EIRP_base,(NO_cell+1)^NO_user);
 
@@ -103,10 +98,8 @@ Signal_power_fromBS_Interference_user = zeros(NO_user,NO_SC,NO_EIRP_base,(NO_cel
 Coordinates_antenna = zeros(NO_cell);
 Coordinates_antenna(1) = 0;
 
-
 %% Coordinate Testing %%
-Preset_Coordinates = [7, 1, 2];
-
+Preset_Coordinates = [7, 1, 2]; % if needed
 
 for a = 2:7
     Coordinates_antenna(a) = IS_distance * cos(a * pi/3 - pi/6) + 1i * IS_distance * sin(a * pi/3 - pi/6);
@@ -142,8 +135,8 @@ for Drop_index = 1:NO_drop_trial
                 
                 Coordinates(user_index) = 0;
             else
-                %user_cell = randi(7);
-                user_cell = Preset_Coordinates(user_index);
+                user_cell = randi(7);
+                %user_cell = Preset_Coordinates(user_index);
                 if user_cell == 1
                     Coordinates(user_index) = dx + dy*1i;
                 else
@@ -315,7 +308,7 @@ for Drop_index = 1:NO_drop_trial
         select_user_antenna_pair = zeros(1,NO_RB);
         
         for Timing_interval_index = 1:Timing_interval
-            %% PFmetric計算 %%
+            %% PFmetric計算
             Max_CC_modulation = zeros(NO_user,NO_RB,(NO_cell+1)^NO_user);
             modulation_index = zeros(NO_user,NO_RB,(NO_cell+1)^NO_user);
             select_usermod = zeros(NO_RB,NO_user);
@@ -347,7 +340,7 @@ for Drop_index = 1:NO_drop_trial
             end
             
             
-            %% 容量計算 (従来方式)%%
+            %% 容量計算 (従来方式)
             Capacity_trial_realnear_prop = 0;
             Capacity_trial_realfar_prop = 0;
             capacity_macro_Conv_SC = zeros(NO_user,NO_SC);
@@ -388,7 +381,7 @@ for Drop_index = 1:NO_drop_trial
                 past_throughput(:, 1) = Capacity_band_ave_macro_Conv.';
                 
                 % Get sumrate of the network
-                sumrate(1, 1) = sum(Capacity_byuser_cur_macro_Conv); 
+                sumrate = sum(Capacity_byuser_cur_macro_Conv); 
             end
             
             % one:
@@ -424,4 +417,3 @@ for Drop_index = 1:NO_drop_trial
     disp("end of trials");
     toc
 end
-
