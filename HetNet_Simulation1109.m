@@ -5,39 +5,39 @@ load('CCCtable_2antenna')
 rng('shuffle')
 
 %% シミュレーション条件 %%
-NO_user = 3;                                                                % ユーザ数
-NO_Interference_cell = 19;                                                  % 19 Hexagonal area
-NO_cell = 7;                                                                % picoBS数
+NO_user = 3;                         % ユーザ数
+% NO_Interference_cell = 19;           % 19 Hexagonal area
+NO_cell = 7;                         % picoBS数
 
-Center_frequency = 2.0*10^9;                                                % 中心周波数
-NO_SC_inRB = 12;                                                            % 1RBに含まれるsubcarrier数
-NO_RB = 24;                                                                 % 1OFDMシンボルに含まれるRBの数
-NO_SC = NO_SC_inRB * NO_RB;                                                 % 1OFDMシンボルに含まれるsubcarrierの数
-Band_RB = 180*10^3;                                                         % 1RBに使用する周波数帯域
-Band_SC = Band_RB / NO_SC_inRB;                                             % 1Subcarrierに使用する周波数帯域
-Band = Band_RB * NO_RB;                                                     % 使用する周波数帯域
-NO_time_trial = 3;                                                          % 時間の試行回数
-Timing_interval = 60;                                                       % チャネルを固定するインターバル                                                  
-NO_drop_trial = 1200;                                                       % ユーザドロップの試行回数
-TI = 60;                                                                    % Time Interval
-NO_path = 6;                                                                % Jake'sモデルにおけるパスの数
-Doppler = 5.55;                                                             % Jake'sモデルにおけるドップラーシフト値[Hz]
-Decay = 1;                                                                  % Jake'sモデルにおけるパスごとの減衰量
-Interval = 1 / Band;                                                        % Jake'sモデルにおけるサンプリングインターバル
-JI = 600;                                                                   % JakeInterval...fade.mを一周させるために数サンプルごとに取り出すようにする
-rms_delay_spread = 1.0 * 10^(-6);                                           % 遅延スプレッド値
-IS_distance = 500;                                                          % Inter-site distance
-Shadowing_ave = 0;                                                          % Shadowingの平均値
-Shadowing_var_Macro = 8;                                                    % MacroBS Shadowingの分散値
-Shadowing_var_Pico = 10;                                                    % PicoBS Shadowingの分散値
-Correlation_jake_coefficient = 0.44;                                        % 相関係数0.5に対応してjakeに入れる係数
+% Center_frequency = 2.0*10^9;         % 中心周波数
+NO_SC_inRB = 12;                     % 1RBに含まれるsubcarrier数
+NO_RB = 24;                          % 1OFDMシンボルに含まれるRBの数
+NO_SC = NO_SC_inRB * NO_RB;          % 1OFDMシンボルに含まれるsubcarrierの数
+Band_RB = 180*10^3;                  % 1RBに使用する周波数帯域
+% Band_SC = Band_RB / NO_SC_inRB;      % 1Subcarrierに使用する周波数帯域
+Band = Band_RB * NO_RB;              % 使用する周波数帯域
+NO_time_trial = 1;                   % 時間の試行回数 (3)
+Timing_interval = 60;                % チャネルを固定するインターバル                                                   
+NO_drop_trial = 1;                % ユーザドロップの試行回数 (1200)
+TI = 60;                             % Time Interval
+NO_path = 6;                         % Jake'sモデルにおけるパスの数
+% Doppler = 5.55;                      % Jake'sモデルにおけるドップラーシフト値[Hz]
+% Decay = 1;                           % Jake'sモデルにおけるパスごとの減衰量
+Interval = 1 / Band;                 % Jake'sモデルにおけるサンプリングインターバル
+% JI = 600;                            % JakeInterval...fade.mを一周させるために数サンプルごとに取り出すようにする
+rms_delay_spread = 1.0 * 10^(-6);    % 遅延スプレッド値
+IS_distance = 500;                   % Inter-site distance
+Shadowing_ave = 0;                   % Shadowingの平均値
+Shadowing_var_Macro = 8;             % MacroBS Shadowingの分散値
+Shadowing_var_Pico = 10;             % PicoBS Shadowingの分散値
+% Correlation_jake_coefficient = 0.44; % 相関係数0.5に対応してjakeに入れる係数
 Receiver_noise_density = -174;
-NO_EIRP_base = 1;                                                           % MacroBS放射電力制御係数
-NO_EIRP_picobase = 1;                                                       % PicoBS放射電力制御係数(今は制御していない)
-NO_Analyze = 10000;                                                         % 解析数
+NO_EIRP_base = 1;                    % MacroBS放射電力制御係数
+% NO_EIRP_picobase = 1;                % PicoBS放射電力制御係数(今は制御していない)
+NO_Analyze = 10000;                  % 解析数
 
 
-%% HARUYA %%
+%% Saving to Folder %%
 
 % remove a couple of data in the beginning 
 remove_beginning = 20;
@@ -60,7 +60,7 @@ sumrate = zeros(1, 1);
 % for saving, we divide the data for each NO_time_trail
 
 % create the main folder for saving:
-data_folder_name = datestr(datetime('now', 'TimeZone','local','Format','y-MM-dd_HH:mm'), 'yyyy-mm-dd_HH-MM');
+data_folder_name = datestr(datetime('now', 'TimeZone','local','Format','y-MM-dd_HH:mm:ss'), 'yyyy-mm-dd_HH-MM-SS');
 [status, msg] = mkdir(data_folder_name);
 if status ~= 1
     disp(msg);
@@ -83,9 +83,8 @@ SINR_RB_user_floor = zeros (NO_user,NO_RB,NO_EIRP_base);
 channel_responce_freq = zeros(NO_user,NO_cell,NO_SC); %
 channel_responce_time_rayleigh = zeros(NO_user,NO_cell,NO_SC); %
 
-Coordinates_table = zeros(floor(IS_distance / 2 / sqrt(3)),floor(IS_distance / 2));  % 座標を作るための表
 Coordinates = zeros(1,NO_user);                                                      % ユーザの座標を格納
-Coordinates_Interference = zeros(1,NO_Interference_cell);                            % 干渉基地局(Macro)の座標を格納                     
+% Coordinates_Interference = zeros(1,NO_Interference_cell);                            % 干渉基地局(Macro)の座標を格納                     
 
 Capacity_byuser_macro_Conv = zeros(NO_user,NO_EIRP_base,NO_drop_trial);
 Capacity_Analyze_Conv = zeros(NO_Analyze,11);     % using                                     
@@ -103,16 +102,23 @@ Signal_power_fromBS_Interference_user = zeros(NO_user,NO_SC,NO_EIRP_base,(NO_cel
 %% BSの座標決定 %%
 Coordinates_antenna = zeros(NO_cell);
 Coordinates_antenna(1) = 0;
+
+
+%% Coordinate Testing %%
+Preset_Coordinates = [7, 1, 2];
+
+
 for a = 2:7
     Coordinates_antenna(a) = IS_distance * cos(a * pi/3 - pi/6) + 1i * IS_distance * sin(a * pi/3 - pi/6);
 end
 
- for BS_index = 1:6
-     Coordinates_Interference(BS_index) = 2*IS_distance * cos(BS_index * pi/3 - pi/6) + 2i * IS_distance * sin(BS_index * pi/3 - pi/6)+IS_distance * cos(BS_index * pi/3 - pi/6 + pi/3) + 1i * IS_distance * sin(BS_index * pi/3 - pi/6 + pi/3);
-     for a = 1:6
-         Coordinates_Interference(BS_index * 6 + a) = Coordinates_Interference(BS_index) + IS_distance * cos(a * pi/3 - pi/6) + 1i * IS_distance * sin(a * pi/3 - pi/6);
-     end
- end
+% 1-6だけだったけど使っているのか？
+% for BS_index = 1:6
+%     Coordinates_Interference(BS_index) = 2*IS_distance * cos(BS_index * pi/3 - pi/6) + 2i * IS_distance * sin(BS_index * pi/3 - pi/6)+IS_distance * cos(BS_index * pi/3 - pi/6 + pi/3) + 1i * IS_distance * sin(BS_index * pi/3 - pi/6 + pi/3);
+%     for a = 1:6
+%         Coordinates_Interference(BS_index * 6 + a) = Coordinates_Interference(BS_index) + IS_distance * cos(a * pi/3 - pi/6) + 1i * IS_distance * sin(a * pi/3 - pi/6);
+%     end
+% end
 
 %% 遅延プロファイル作成 %%
 for path_index = 1:NO_path
@@ -123,12 +129,11 @@ Delay_profile = Delay_profile / sum(Delay_profile);
 %% ユーザ配置を変えてシミュレーション %%    
 for Drop_index = 1:NO_drop_trial
     tic
-    Drop_index;
+    disp(Drop_index);
 
     %% ユーザ配置の決定 %%
-
     for user_index = 1:NO_user
-        Coordinates(user_index) = 0;
+        Coordinates(user_index) = 0;        % initialization
         while Coordinates(user_index) == 0
             dx = (rand-0.5) * 2 * IS_distance / sqrt(3);
             dy = (rand-0.5) * 2 * IS_distance / sqrt(3);
@@ -137,11 +142,13 @@ for Drop_index = 1:NO_drop_trial
                 
                 Coordinates(user_index) = 0;
             else
-                user_cell = randi(7);
+                %user_cell = randi(7);
+                user_cell = Preset_Coordinates(user_index);
                 if user_cell == 1
-                    Coordinates(user_index) = dx+dy*1i;
+                    Coordinates(user_index) = dx + dy*1i;
                 else
-                    Coordinates(user_index) = Coordinates_antenna(user_cell - 1) +dx+dy*1i;
+                    %Coordinates(user_index) = Coordinates_antenna(user_cell - 1) + dx + dy*1i;
+                    Coordinates(user_index) = Coordinates_antenna(user_cell) + dx + dy*1i;
                 end
             end
         end
@@ -154,6 +161,7 @@ for Drop_index = 1:NO_drop_trial
     end
 
     %%　アンテナパターン　%%
+    %% ここはどこで使える？
     Rank_distance = zeros(1,NO_user);
     Coordinates_pre = Coordinates;
     for Divide_index = 1:NO_user/2
@@ -242,7 +250,7 @@ for Drop_index = 1:NO_drop_trial
         for user_antenna_pair = 1:(NO_cell+1)^NO_user 
             nono = find(user_antenna_pair == notpair(:));
             if isempty(nono) == 1
-                user_antenna_pair_shift = user_antenna_pair-1;
+                user_antenna_pair_shift = user_antenna_pair - 1; % なんで1引く？
                 for user_index = 1:NO_user     
                     cell_index_select = fix(user_antenna_pair_shift/(NO_cell+1)^(NO_user-user_index))+1;
                     user_antenna_pair_shift = rem(user_antenna_pair_shift,(NO_cell+1)^(NO_user-user_index));
