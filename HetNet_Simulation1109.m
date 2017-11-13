@@ -1,8 +1,8 @@
 clear;
-load('CCCtable_2antenna')
+load('CCCtable_2antenna');
 
 %% Randomize Every Simulation %%
-rng('shuffle')
+rng('shuffle');
 
 %% シミュレーション条件 %%
 NO_user = 3;                         % ユーザ数
@@ -16,9 +16,9 @@ NO_SC = NO_SC_inRB * NO_RB;          % 1OFDMシンボルに含まれるsubcarrierの数
 Band_RB = 180*10^3;                  % 1RBに使用する周波数帯域
 % Band_SC = Band_RB / NO_SC_inRB;      % 1Subcarrierに使用する周波数帯域
 Band = Band_RB * NO_RB;              % 使用する周波数帯域
-NO_time_trial = 1;                   % 時間の試行回数 (3)
+NO_time_trial = 3;                   % 時間の試行回数 (3)
 Timing_interval = 60;                % チャネルを固定するインターバル                                                   
-NO_drop_trial = 1;                % ユーザドロップの試行回数 (1200)
+NO_drop_trial = 300;                % ユーザドロップの試行回数 (1200)
 TI = 60;                             % Time Interval
 NO_path = 6;                         % Jake'sモデルにおけるパスの数
 % Doppler = 5.55;                      % Jake'sモデルにおけるドップラーシフト値[Hz]
@@ -147,7 +147,9 @@ for Drop_index = 1:NO_drop_trial
                 if user_cell == 1
                     Coordinates(user_index) = dx + dy*1i;
                 else
-                    %Coordinates(user_index) = Coordinates_antenna(user_cell - 1) + dx + dy*1i;
+                    %Coordinates(user_index) =
+                    %Coordinates_antenna(user_cell - 1) + dx + dy*1i;
+                    %this part was wrong
                     Coordinates(user_index) = Coordinates_antenna(user_cell) + dx + dy*1i;
                 end
             end
@@ -160,8 +162,8 @@ for Drop_index = 1:NO_drop_trial
         PLR_fromBS(Drop_index,cell_index,:) = 140.7 + 36.7 * log10(Distance_fromBS(Drop_index,cell_index,:)*0.001);  
     end
 
-    %%　アンテナパターン　%%
-    %% ここはどこで使える？
+    %% アンテナパターン %%
+    % ここはどこで使える？
     Rank_distance = zeros(1,NO_user);
     Coordinates_pre = Coordinates;
     for Divide_index = 1:NO_user/2
@@ -313,7 +315,7 @@ for Drop_index = 1:NO_drop_trial
         select_user_antenna_pair = zeros(1,NO_RB);
         
         for Timing_interval_index = 1:Timing_interval
-           %% PFmetric計算 %%
+            %% PFmetric計算 %%
             Max_CC_modulation = zeros(NO_user,NO_RB,(NO_cell+1)^NO_user);
             modulation_index = zeros(NO_user,NO_RB,(NO_cell+1)^NO_user);
             select_usermod = zeros(NO_RB,NO_user);
@@ -345,8 +347,7 @@ for Drop_index = 1:NO_drop_trial
             end
             
             
-          %% 容量計算 (従来方式)%%
-
+            %% 容量計算 (従来方式)%%
             Capacity_trial_realnear_prop = 0;
             Capacity_trial_realfar_prop = 0;
             capacity_macro_Conv_SC = zeros(NO_user,NO_SC);
@@ -359,40 +360,20 @@ for Drop_index = 1:NO_drop_trial
                     if SINR_user ~= -inf
                         farmod_index = select_usermod(RB_index,user_index);
                         capacity_macro_Conv_SC(user_index,SC_index) = CCCtable_conv_SINRp_alphap_QAMq_QAMp(SINR_user,1,1,farmod_index);     %所望信号容量
-
-                        %% 解析プログラム %%
-                        if Timing_interval_index > 20
-                            if mod(SC_index,NO_RB) == 2
-                                if Analyze_index_Conv > 10000  || Analyze_index_Conv <= 0
-                                else
-                                   Capacity_Analyze_Conv(Analyze_index_Conv,1) = SINR_user;
-                                end
-                            end
-                        end
+                        
+                        %% add capacity ave.
                         Capacity_byuser_cur_macro_Conv(user_index) = Capacity_byuser_cur_macro_Conv(user_index) + capacity_macro_Conv_SC(user_index,SC_index) ;
-
-                        if Timing_interval_index > 20
+                        
+                        if Timing_interval_index > remove_beginning
                             Capacity_byuser_macro_Conv(user_index,1,Drop_index) = Capacity_byuser_macro_Conv(user_index,1,Drop_index) + capacity_macro_Conv_SC(user_index,SC_index) ;
-                        end
-
-                        %% 解析プログラム %%
-                        if Timing_interval_index > 20
-                            if mod(SC_index,NO_RB) == 2
-                                if Analyze_index_Conv > 10000  || Analyze_index_Conv <= 0
-                                else
-                                    Capacity_Analyze_Conv(Analyze_index_Conv,2) = SINR_user;
-                                    Analyze_index_Conv = Analyze_index_Conv + 1;
-                                end
-                            end
                         end
                     end
                 end
             end
             
             %% saving data
-            
+            % at 60
             if Timing_interval_index == 60
-                
                 % Get combination (base 10 to base 8)
                 for rb_index= 1:NO_RB
                     a1 = floor((select_user_antenna_pair(1, rb_index)-1)/64) + 1;
@@ -407,8 +388,7 @@ for Drop_index = 1:NO_drop_trial
                 past_throughput(:, 1) = Capacity_band_ave_macro_Conv.';
                 
                 % Get sumrate of the network
-                sumrate(1, 1) = sum(Capacity_byuser_cur_macro_Conv);
-                
+                sumrate(1, 1) = sum(Capacity_byuser_cur_macro_Conv); 
             end
             
             % one:
@@ -436,7 +416,7 @@ for Drop_index = 1:NO_drop_trial
         save('sumrate.mat', 'sumrate');
         
         % clean up:
-        trial_count = trial_count+1;
+        trial_count = trial_count + 1;
         cd(home)
         
     end 
