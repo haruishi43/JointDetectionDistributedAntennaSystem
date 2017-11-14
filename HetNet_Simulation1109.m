@@ -137,14 +137,14 @@ for Drop_index = 1:NO_drop_trial
             else
                 user_cell = randi(7);
                 %user_cell = Preset_Coordinates(user_index);
-                if user_cell == 1
-                    Coordinates(user_index) = dx + dy*1i;
-                else
-                    %Coordinates(user_index) =
-                    %Coordinates_antenna(user_cell - 1) + dx + dy*1i;
-                    %this part was wrong
-                    Coordinates(user_index) = Coordinates_antenna(user_cell) + dx + dy*1i;
-                end
+%                 if user_cell == 1
+%                     Coordinates(user_index) = dx + dy*1i;
+%                 else
+%                     %Coordinates(user_index) = Coordinates_antenna(user_cell - 1) + dx + dy*1i;
+%                     %this part was wrong
+%                     Coordinates(user_index) = Coordinates_antenna(user_cell) + dx + dy*1i;
+%                 end
+                Coordinates(user_index) = Coordinates_antenna(user_cell) + dx + dy*1i;
             end
         end
     end
@@ -186,7 +186,7 @@ for Drop_index = 1:NO_drop_trial
             end
         end
         
-        %% Average %%
+        %% Average （→ チャネル応答）%%
         for user_index = 1:NO_user
             for cell_index = 1:NO_cell
                for RB_index = 1:NO_RB
