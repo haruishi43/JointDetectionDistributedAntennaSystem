@@ -28,8 +28,8 @@ Interval = 1 / Band;                 % Jake'sƒ‚ƒfƒ‹‚É‚¨‚¯‚éƒTƒ“ƒvƒŠƒ“ƒOƒCƒ“ƒ^[ƒ
 rms_delay_spread = 1.0 * 10^(-6);    % ’x‰„ƒXƒvƒŒƒbƒh’l
 IS_distance = 500;                   % Inter-site distance
 Shadowing_ave = 0;                   % Shadowing‚Ì•½‹Ï’l
-Shadowing_var_Macro = 8;             % MacroBS Shadowing‚Ì•ªU’l
-Shadowing_var_Pico = 10;             % PicoBS Shadowing‚Ì•ªU’l
+Shadowing_var_Macro = 8;             % MacroBS Shadowing‚Ì•ªU’liHj
+Shadowing_var_Pico = 10;             % PicoBS Shadowing‚Ì•ªU’liHj
 % Correlation_jake_coefficient = 0.44; % ‘ŠŠÖŒW”0.5‚É‘Î‰‚µ‚Äjake‚É“ü‚ê‚éŒW”
 Receiver_noise_density = -174;
 NO_EIRP_base = 1;                    % MacroBS•úË“d—Í§ŒäŒW”
@@ -85,7 +85,7 @@ Coordinates = zeros(1,NO_user);                                                 
 % Coordinates_Interference = zeros(1,NO_Interference_cell);                            % Š±ÂŠî’n‹Ç(Macro)‚ÌÀ•W‚ğŠi”[                     
 
 Capacity_byuser_macro_Conv = zeros(NO_user,NO_EIRP_base,NO_drop_trial);                                   
-Delay_profile = zeros(1,NO_path);
+Delay_profile = zeros(1,NO_path); % ’x‰„
 
 Distance_fromBS = zeros(NO_drop_trial,NO_cell,NO_user);
 Distance_fromBS_pre = zeros(NO_drop_trial,NO_cell,NO_user);
@@ -105,7 +105,7 @@ for a = 2:7
     Coordinates_antenna(a) = IS_distance * cos(a * pi/3 - pi/6) + 1i * IS_distance * sin(a * pi/3 - pi/6);
 end
 
-% 1-6‚¾‚¯‚¾‚Á‚½‚¯‚Çg‚Á‚Ä‚¢‚é‚Ì‚©H
+% ‚È‚ñ‚Å1-6‚¾‚¯g‚Á‚Ä‚¢‚é‚Ì‚©H‚»‚à‚»‚àCoordinates_Interferenceg‚í‚ê‚Ä‚¢‚È‚¢
 % for BS_index = 1:6
 %     Coordinates_Interference(BS_index) = 2*IS_distance * cos(BS_index * pi/3 - pi/6) + 2i * IS_distance * sin(BS_index * pi/3 - pi/6)+IS_distance * cos(BS_index * pi/3 - pi/6 + pi/3) + 1i * IS_distance * sin(BS_index * pi/3 - pi/6 + pi/3);
 %     for a = 1:6
@@ -177,7 +177,7 @@ for Drop_index = 1:NO_drop_trial
         Capacity_band_ave_macro_Conv = zeros(1,NO_user);    % Band–ˆ‚Ì•½‹ÏCapacity‚ğŠi”[
     
        %% Rayleigh Fading•t‰Á %%
-        GI = 32;       
+        GI = 32;% not used    
         for user_index = 1:NO_user
             for cell_index = 1:NO_cell
                 channel_responce_time_rayleigh(user_index,cell_index,1:length(pow_amp)) = (1/sqrt(2).*(randn(1,length(pow_amp))+1j*randn(1,length(pow_amp)))) .* sqrt(Delay_profile);
@@ -196,6 +196,7 @@ for Drop_index = 1:NO_drop_trial
         end
         
        %% ƒVƒƒƒhƒEƒCƒ“ƒOŒvZ %%
+       % g‚í‚ê‚Ä‚¢‚È‚¢H
         Shadowing_correlation_matrix=ones(42,42);
         Shadowing_correlation_matrix=Shadowing_correlation_matrix*0.5;
         Shadowing=zeros(42,1);
@@ -206,7 +207,8 @@ for Drop_index = 1:NO_drop_trial
         Shadowing_correlation_matrix=sqrtm(Shadowing_correlation_matrix);
         Shadowing=Shadowing_correlation_matrix*Shadowing;
         Shadowing=10.^((Shadowing)/10);
-
+        
+        % ‚±‚±‚Íg‚í‚ê‚Ä‚¢‚é (shadowing‚ğg‚¤Hj
         Shadowing_macro = sqrt(Shadowing_var_Macro).*randn(1,1)+Shadowing_ave;
         Shadowing_macro = 10.^((Shadowing_macro)/10);
         
@@ -304,7 +306,7 @@ for Drop_index = 1:NO_drop_trial
         end
         
         Max_PFmetric_RB_Conv = zeros(Timing_interval,NO_RB);
-        Capacity_Analyze_band_ave_macro_Conv = zeros(Timing_interval,NO_user);
+        Capacity_Analyze_band_ave_macro_Conv = zeros(Timing_interval,NO_user); % H
         select_user_antenna_pair = zeros(1,NO_RB);
         
         for Timing_interval_index = 1:Timing_interval
@@ -386,7 +388,7 @@ for Drop_index = 1:NO_drop_trial
             
             % one:
             Capacity_band_ave_macro_Conv = (1-1/TI)*Capacity_band_ave_macro_Conv + 1/TI*Capacity_byuser_cur_macro_Conv;
-            % all:
+            % all: g‚í‚ê‚Ä‚¢‚È‚¢
             Capacity_Analyze_band_ave_macro_Conv(Timing_interval_index,:) = Capacity_band_ave_macro_Conv;
             
             
