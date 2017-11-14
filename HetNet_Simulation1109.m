@@ -196,23 +196,21 @@ for Drop_index = 1:NO_drop_trial
         end
         
        %% シャドウイング計算 %%
-       % 使われていない？
-        Shadowing_correlation_matrix=ones(42,42);
-        Shadowing_correlation_matrix=Shadowing_correlation_matrix*0.5;
-        Shadowing=zeros(42,1);
-        for BS_index = 1:42
-            Shadowing(BS_index)=Shadowing_var_Pico.*randn(1,1)+Shadowing_ave; % Shadowing_ave is always 0? % Why Shadowing_var_pico
-            Shadowing_correlation_matrix(BS_index,BS_index)=1;
-        end
-        Shadowing_correlation_matrix=sqrtm(Shadowing_correlation_matrix);
-        Shadowing=Shadowing_correlation_matrix*Shadowing;
-        Shadowing=10.^((Shadowing)/10);
+       % 周辺BSからの干渉は考えられていない
+%         Shadowing_correlation_matrix=ones(42,42);
+%         Shadowing_correlation_matrix=Shadowing_correlation_matrix*0.5;
+%         Shadowing=zeros(42,1);
+%         for BS_index = 1:42
+%             Shadowing(BS_index)=Shadowing_var_Pico.*randn(1,1)+Shadowing_ave; % Shadowing_ave is always 0? % Why Shadowing_var_pico
+%             Shadowing_correlation_matrix(BS_index,BS_index)=1;
+%         end
+%         Shadowing_correlation_matrix=sqrtm(Shadowing_correlation_matrix);
+%         Shadowing=Shadowing_correlation_matrix*Shadowing;
+%         Shadowing=10.^((Shadowing)/10);
         
-        % ここは使われている (shadowingを使う？）
-        % ここを1にする
-%         Shadowing_macro = sqrt(Shadowing_var_Macro).*randn(1,1)+Shadowing_ave;
+        % 本来ユーザごとに異なるはずなのでコメントアウトした
+%         Shadowing_macro = sqrt(Shadowing_var_Macro).*randn(1,1) + Shadowing_ave; % log normalization (どこをとるかはrand)
 %         Shadowing_macro = 10.^((Shadowing_macro)/10);
-        Shadowing_macro = 1.0; % force Shadowing_macro to 1
         
         %% Antenna Pairing %%
         a = zeros(1,user_index);
@@ -257,10 +255,14 @@ for Drop_index = 1:NO_drop_trial
                     if cell_index_select == 8
                         Signal_power_fromBS_user(user_index,:,EIRP_index) = 0;
                     else
-                        Signal_power_fromBS_user(user_index,:,EIRP_index,user_antenna_pair) = Shadowing_macro * 10.^((EIRP_base(EIRP_index)  - repmat(PLR_fromBS(Drop_index,cell_index_select,user_index)',NO_SC,1))/10) .* (abs(squeeze(channel_responce_freq(user_index,cell_index_select,:))).^2);    %マクロBSからの受信電力 
+                        % シャドーイングの値をsqrt(Shadowing_var_Macro).*randn(1,1)とし，毎ユーザで値を変える
+                        % 基地局・ユーザの干渉
+                        Signal_power_fromBS_user(user_index,:,EIRP_index,user_antenna_pair) = sqrt(Shadowing_var_Macro).*randn(1,1) * 10.^((EIRP_base(EIRP_index)  - repmat(PLR_fromBS(Drop_index,cell_index_select,user_index)',NO_SC,1))/10) .* (abs(squeeze(channel_responce_freq(user_index,cell_index_select,:))).^2);    %マクロBSからの受信電力 
                         for user_index_int = 1:NO_user
                             if user_index_int ~= user_index
-                                Signal_power_fromBS_Interference_user(user_index_int,:,EIRP_index,user_antenna_pair) = squeeze(Signal_power_fromBS_Interference_user(user_index_int,:,EIRP_index,user_antenna_pair)).' + abs(Shadowing_macro * 10.^((EIRP_base(EIRP_index) - repmat(PLR_fromBS(Drop_index,cell_index_select,user_index_int)',NO_SC,1))/10) .* (abs(squeeze(channel_responce_freq(user_index_int,cell_index_select,:))).^2));    %マクロBSからの受信電力
+                                % シャドーイングの値をsqrt(Shadowing_var_Macro).*randn(1,1)とし，毎ユーザで値を変える
+                                % ユーザ同士の干渉
+                                Signal_power_fromBS_Interference_user(user_index_int,:,EIRP_index,user_antenna_pair) = squeeze(Signal_power_fromBS_Interference_user(user_index_int,:,EIRP_index,user_antenna_pair)).' + abs(sqrt(Shadowing_var_Macro).*randn(1,1) * 10.^((EIRP_base(EIRP_index) - repmat(PLR_fromBS(Drop_index,cell_index_select,user_index_int)',NO_SC,1))/10) .* (abs(squeeze(channel_responce_freq(user_index_int,cell_index_select,:))).^2));    %マクロBSからの受信電力
                             end
                         end
                     end
