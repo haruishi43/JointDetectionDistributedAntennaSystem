@@ -18,7 +18,7 @@ Band_RB = 180*10^3;                  % 1RBに使用する周波数帯域
 Band = Band_RB * NO_RB;              % 使用する周波数帯域
 NO_time_trial = 3;                   % 時間の試行回数 (3)
 Timing_interval = 60;                % チャネルを固定するインターバル                                                   
-NO_drop_trial = 1200;                % ユーザドロップの試行回数 (1200)
+NO_drop_trial = 1;                % ユーザドロップの試行回数 (1200)
 TI = 60;                             % Time Interval
 NO_path = 6;                         % Jake'sモデルにおけるパスの数
 % Doppler = 5.55;                      % Jake'sモデルにおけるドップラーシフト値[Hz]
@@ -137,13 +137,6 @@ for Drop_index = 1:NO_drop_trial
             else
                 user_cell = randi(7);
                 %user_cell = Preset_Coordinates(user_index);
-%                 if user_cell == 1
-%                     Coordinates(user_index) = dx + dy*1i;
-%                 else
-%                     % Coordinates(user_index) = Coordinates_antenna(user_cell - 1) + dx + dy*1i;
-%                     % this part was wrong
-%                     % change to: Coordinates(user_index) = Coordinates_antenna(user_cell) + dx + dy*1i;
-%                 end
                 Coordinates(user_index) = Coordinates_antenna(user_cell) + dx + dy*1i;
             end
         end
@@ -157,17 +150,18 @@ for Drop_index = 1:NO_drop_trial
 
     %% アンテナパターン %%
     % ここはどこで使える？
-    Rank_distance = zeros(1,NO_user);
-    Coordinates_pre = Coordinates;
-    for Divide_index = 1:NO_user/2
-        for user_index = 1:NO_user
-            if abs(Coordinates_pre(user_index)) == max(abs(Coordinates_pre))
-                Rank_distance(user_index) = -1;
-                Coordinates_pre(user_index) = 0;
-                break
-            end
-        end
-    end
+%     Rank_distance = zeros(1,NO_user);
+%     Coordinates_pre = Coordinates;
+%     for Divide_index = 1:NO_user/2
+%         for user_index = 1:NO_user
+%             if abs(Coordinates_pre(user_index)) == max(abs(Coordinates_pre))
+%                 Rank_distance(user_index) = -1;
+%                 Coordinates_pre(user_index) = 0;
+%                 break
+%             end
+%         end
+%     end
+    
     pow_amp = [10^(-0.30) 10^(-0.00) 10^(-0.20)  10^(-0.6)  10^(-0.8)  10^(-1.0)];
     tot_pow = sum(pow_amp);
      
@@ -310,7 +304,7 @@ for Drop_index = 1:NO_drop_trial
         end
         
         Max_PFmetric_RB_Conv = zeros(Timing_interval,NO_RB);
-        Capacity_Analyze_band_ave_macro_Conv = zeros(Timing_interval,NO_user); % ？
+        %Capacity_Analyze_band_ave_macro_Conv = zeros(Timing_interval,NO_user); % ？
         select_user_antenna_pair = zeros(1,NO_RB);
         
         for Timing_interval_index = 1:Timing_interval
@@ -347,8 +341,8 @@ for Drop_index = 1:NO_drop_trial
             
             
             %% 容量計算 (従来方式)
-            Capacity_trial_realnear_prop = 0;
-            Capacity_trial_realfar_prop = 0;
+            %Capacity_trial_realnear_prop = 0;
+            %Capacity_trial_realfar_prop = 0;
             capacity_macro_Conv_SC = zeros(NO_user,NO_SC);
             Capacity_byuser_cur_macro_Conv = zeros(1,NO_user);
 
@@ -393,14 +387,13 @@ for Drop_index = 1:NO_drop_trial
             % one:
             Capacity_band_ave_macro_Conv = (1-1/TI)*Capacity_band_ave_macro_Conv + 1/TI*Capacity_byuser_cur_macro_Conv;
             % all: 使われていない
-            Capacity_Analyze_band_ave_macro_Conv(Timing_interval_index,:) = Capacity_band_ave_macro_Conv;
+            %Capacity_Analyze_band_ave_macro_Conv(Timing_interval_index,:) = Capacity_band_ave_macro_Conv;
             
             
         end
         % end of timing_interval
         
         %% saving data
-        %channel_response
         dir_trial_name = int2str(trial_count);
         basename = fullfile(data_root, dir_trial_name);
         [status, msg] = mkdir(basename);
