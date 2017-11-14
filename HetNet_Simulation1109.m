@@ -140,9 +140,9 @@ for Drop_index = 1:NO_drop_trial
 %                 if user_cell == 1
 %                     Coordinates(user_index) = dx + dy*1i;
 %                 else
-%                     %Coordinates(user_index) = Coordinates_antenna(user_cell - 1) + dx + dy*1i;
-%                     %this part was wrong
-%                     Coordinates(user_index) = Coordinates_antenna(user_cell) + dx + dy*1i;
+%                     % Coordinates(user_index) = Coordinates_antenna(user_cell - 1) + dx + dy*1i;
+%                     % this part was wrong
+%                     % change to: Coordinates(user_index) = Coordinates_antenna(user_cell) + dx + dy*1i;
 %                 end
                 Coordinates(user_index) = Coordinates_antenna(user_cell) + dx + dy*1i;
             end
@@ -209,8 +209,10 @@ for Drop_index = 1:NO_drop_trial
         Shadowing=10.^((Shadowing)/10);
         
         % ここは使われている (shadowingを使う？）
-        Shadowing_macro = sqrt(Shadowing_var_Macro).*randn(1,1)+Shadowing_ave;
-        Shadowing_macro = 10.^((Shadowing_macro)/10);
+        % ここを1にする
+%         Shadowing_macro = sqrt(Shadowing_var_Macro).*randn(1,1)+Shadowing_ave;
+%         Shadowing_macro = 10.^((Shadowing_macro)/10);
+        Shadowing_macro = 1.0; % force Shadowing_macro to 1
         
         %% Antenna Pairing %%
         a = zeros(1,user_index);
