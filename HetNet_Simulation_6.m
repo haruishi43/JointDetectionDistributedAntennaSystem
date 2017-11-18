@@ -18,8 +18,8 @@ Band_RB = 180*10^3;                  % 1RBに使用する周波数帯域
 Band = Band_RB * NO_RB;              % 使用する周波数帯域
 NO_time_trial = 1;                   % 時間の試行回数 (3)
 Timing_interval = 60;                % チャネルを固定するインターバル 
-Trials_per_drop = 2000;
-NO_drop_trial = 42 * Trials_per_drop;% ユーザドロップの試行回数 (1200)
+Trials_per_drop = 3000;
+NO_drop_trial = 30 * Trials_per_drop;% ユーザドロップの試行回数 (1200)
 TI = 60;                             % Time Interval
 NO_path = 6;                         % Jake'sモデルにおけるパスの数
 % Doppler = 5.55;                      % Jake'sモデルにおけるドップラーシフト値[Hz]
@@ -61,6 +61,7 @@ sumrate = 0;
 
 % create the main folder for saving:
 data_folder_name = datestr(datetime('now', 'TimeZone','local','Format','y-MM-dd_HH:mm:ss'), 'yyyy-mm-dd_HH-MM-SS');
+data_folder_name = strcat(data_folder_name, '-6');
 [status, msg] = mkdir(data_folder_name);
 if status ~= 1
     disp(msg);
@@ -101,13 +102,12 @@ Coordinates_antenna(1) = 0;
 
 %% Coordinate Testing %%
 loc = 1;
-Preset_Coordinates = [1 2 3; 1 2 4; 1 2 5; 1 2 6; 1 2 7; 1 2 8;
-                      1 3 2; 1 3 4; 1 3 5; 1 3 6; 1 3 7; 1 3 8;
-                      1 4 2; 1 4 3; 1 4 5; 1 4 6; 1 4 7; 1 4 8;
-                      1 5 2; 1 5 3; 1 5 4; 1 5 6; 1 5 7; 1 5 8;
-                      1 6 2; 1 6 3; 1 6 4; 1 6 5; 1 6 7; 1 6 8;
-                      1 7 2; 1 7 3; 1 7 4; 1 7 5; 1 7 6; 1 7 8;
-                      1 8 2; 1 8 3; 1 8 4; 1 8 5; 1 8 6; 1 8 7]; 
+Preset_Coordinates = [6 1 2; 6 1 3; 6 1 4; 6 1 5; 6 1 7;
+                      6 2 1; 6 2 3; 6 2 4; 6 2 5; 6 2 7;
+                      6 3 1; 6 3 2; 6 3 4; 6 3 5; 6 3 7;
+                      6 4 1; 6 4 2; 6 4 3; 6 4 5; 6 4 7;
+                      6 5 1; 6 5 2; 6 5 3; 6 5 4; 6 5 7;
+                      6 7 1; 6 7 2; 6 7 3; 6 7 4; 6 7 5]; 
 
 
 for a = 2:7
