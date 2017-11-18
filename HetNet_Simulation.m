@@ -101,14 +101,7 @@ Coordinates_antenna(1) = 0;
 
 %% Coordinate Testing %%
 loc = 1;
-Preset_Coordinates = [1 2 3; 1 2 4; 1 2 5; 1 2 6; 1 2 7; 1 2 8;
-                      1 3 2; 1 3 4; 1 3 5; 1 3 6; 1 3 7; 1 3 8;
-                      1 4 2; 1 4 3; 1 4 5; 1 4 6; 1 4 7; 1 4 8;
-                      1 5 2; 1 5 3; 1 5 4; 1 5 6; 1 5 7; 1 5 8;
-                      1 6 2; 1 6 3; 1 6 4; 1 6 5; 1 6 7; 1 6 8;
-                      1 7 2; 1 7 3; 1 7 4; 1 7 5; 1 7 6; 1 7 8;
-                      1 8 2; 1 8 3; 1 8 4; 1 8 5; 1 8 6; 1 8 7]; 
-
+Preset_Coordinates = [1 2 7];
 
 for a = 2:7
     Coordinates_antenna(a) = IS_distance * cos(a * pi/3 - pi/6) + 1i * IS_distance * sin(a * pi/3 - pi/6);
@@ -149,8 +142,8 @@ for Drop_index = 1:NO_drop_trial
                 
                 Coordinates(user_index) = 0;
             else
-                %user_cell = randi(7);
-                user_cell = Preset_Coordinates(loc, user_index);
+                user_cell = randi(7);
+                %user_cell = Preset_Coordinates(loc, user_index);
                 Coordinates(user_index) = Coordinates_antenna(user_cell) + dx + dy*1i;
             end
         end
