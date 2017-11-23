@@ -20,13 +20,16 @@ plr_from_bs = zeros(num_cell, num_user);
 % FIXME: remove magic numbers
 for i = 1:num_cell
     
-    distance = abs( user_coordinates - repmat( antenna_coordinates(i), 1, num_user ) );
+    distance = abs( user_coordinates - repmat( antenna_coordinates(i), 1, num_user ).' );
     
-    distance_from_bs(i, :) = abs( sqrt(distance.^2 + 8.5^2) );
+    distance_from_bs(i, :) = abs( sqrt(distance(:).^2 + 8.5^2) );
     
     plr_from_bs(i, :) = 140.7 + 36.7 * log10( distance_from_bs(i, :) * 0.001 );
     
 end
+
+
+
 
 end
 

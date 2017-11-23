@@ -3,7 +3,7 @@ function channel_response_freq = add_rayleigh_fading( num_user, num_cell, opt_nu
 % FIXME: add desciptions
 
 %% Randomize:
-shuffle('rng');
+rng('shuffle');
 
 %% Check Inputs:
 if nargin < 3
