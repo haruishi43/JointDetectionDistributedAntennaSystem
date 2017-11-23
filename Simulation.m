@@ -9,7 +9,6 @@ NO_user = 3;                         % ユーザ数
 % NO_Interference_cell = 19;           % 19 Hexagonal area
 NO_cell = 7;                         % picoBS数
 
-% Center_frequency = 2.0*10^9;         % 中心周波数
 NO_SC_inRB = 12;                     % 1RBに含まれるsubcarrier数
 NO_RB = 24;                          % 1OFDMシンボルに含まれるRBの数
 NO_SC = NO_SC_inRB * NO_RB;          % 1OFDMシンボルに含まれるsubcarrierの数
@@ -17,24 +16,18 @@ Band_RB = 180*10^3;                  % 1RBに使用する周波数帯域
 % Band_SC = Band_RB / NO_SC_inRB;      % 1Subcarrierに使用する周波数帯域
 Band = Band_RB * NO_RB;              % 使用する周波数帯域
 NO_time_trial = 1;                   % 時間の試行回数 (3)
-Timing_interval = 60;                % チャネルを固定するインターバル 
-Trials_per_drop = 2000;
-NO_drop_trial = 42 * Trials_per_drop;% ユーザドロップの試行回数 (1200)
+Timing_interval = 100;                % チャネルを固定するインターバル 
+NO_drop_trial = 30;                  % ユーザドロップの試行回数 (1200)
 TI = 60;                             % Time Interval
 NO_path = 6;                         % Jake'sモデルにおけるパスの数
-% Doppler = 5.55;                      % Jake'sモデルにおけるドップラーシフト値[Hz]
-% Decay = 1;                           % Jake'sモデルにおけるパスごとの減衰量
 Interval = 1 / Band;                 % Jake'sモデルにおけるサンプリングインターバル
-% JI = 600;                            % JakeInterval...fade.mを一周させるために数サンプルごとに取り出すようにする
 rms_delay_spread = 1.0 * 10^(-6);    % 遅延スプレッド値
 IS_distance = 500;                   % Inter-site distance
 Shadowing_ave = 0;                   % Shadowingの平均値
 Shadowing_var_Macro = 8;             % MacroBS Shadowingの分散値（？）
 Shadowing_var_Pico = 10;             % PicoBS Shadowingの分散値（？）
-% Correlation_jake_coefficient = 0.44; % 相関係数0.5に対応してjakeに入れる係数
 Receiver_noise_density = -174;
 NO_EIRP_base = 1;                    % MacroBS放射電力制御係数
-% NO_EIRP_picobase = 1;                % PicoBS放射電力制御係数(今は制御していない)
 
 
 %% Saving to Folder %%
@@ -100,7 +93,6 @@ Coordinates_antenna = zeros(NO_cell);
 Coordinates_antenna(1) = 0;
 
 %% Coordinate Testing %%
-loc = 1;
 Preset_Coordinates = [1 2 7];
 
 for a = 2:7
@@ -124,11 +116,6 @@ Delay_profile = Delay_profile / sum(Delay_profile);
 %% ユーザ配置を変えてシミュレーション %%    
 for Drop_index = 1:NO_drop_trial
     tic
-    if Drop_index > (Trials_per_drop * loc)
-        loc = loc + 1;
-    end
-    disp(loc);
-    disp(Drop_index);
     
     
     %% ユーザ配置の決定 %%
@@ -143,7 +130,7 @@ for Drop_index = 1:NO_drop_trial
                 Coordinates(user_index) = 0;
             else
                 user_cell = randi(7);
-                %user_cell = Preset_Coordinates(loc, user_index);
+                %user_cell = Preset_Coordinates(user_index);
                 Coordinates(user_index) = Coordinates_antenna(user_cell) + dx + dy*1i;
             end
         end
@@ -154,20 +141,6 @@ for Drop_index = 1:NO_drop_trial
         Distance_fromBS(Drop_index,cell_index,:) = abs(sqrt(Distance_fromBS_pre(Drop_index,cell_index,:).^2 + 8.5^2));           %　マクロ基地局からの3D距離
         PLR_fromBS(Drop_index,cell_index,:) = 140.7 + 36.7 * log10(Distance_fromBS(Drop_index,cell_index,:)*0.001);  
     end
-
-    %% アンテナパターン %%
-    % ここはどこで使える？
-%     Rank_distance = zeros(1,NO_user);
-%     Coordinates_pre = Coordinates;
-%     for Divide_index = 1:NO_user/2
-%         for user_index = 1:NO_user
-%             if abs(Coordinates_pre(user_index)) == max(abs(Coordinates_pre))
-%                 Rank_distance(user_index) = -1;
-%                 Coordinates_pre(user_index) = 0;
-%                 break
-%             end
-%         end
-%     end
     
     pow_amp = [10^(-0.30) 10^(-0.00) 10^(-0.20)  10^(-0.6)  10^(-0.8)  10^(-1.0)];
     tot_pow = sum(pow_amp);
