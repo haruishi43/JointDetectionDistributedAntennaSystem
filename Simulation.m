@@ -115,7 +115,7 @@ Delay_profile = Delay_profile / sum(Delay_profile);
 
 %% ユーザ配置を変えてシミュレーション %%    
 for Drop_index = 1:NO_drop_trial
-    tic
+    %tic
     
     
     %% ユーザ配置の決定 %%
@@ -215,6 +215,7 @@ for Drop_index = 1:NO_drop_trial
             
         
         %% SINR計算 %%
+        %tic
         Noise_power = 1;   
         EIRP_index = 1;
         EIRP_base(EIRP_index) = 0 + 30 - (Receiver_noise_density + 10*log10(Band));       
@@ -227,7 +228,7 @@ for Drop_index = 1:NO_drop_trial
                     user_antenna_pair_shift = rem(user_antenna_pair_shift,(NO_cell+1)^(NO_user-user_index));
 
                     if cell_index_select == 8
-                        Signal_power_fromBS_user(user_index,:,EIRP_index) = 0;
+                        Signal_power_fromBS_user(user_index,:,EIRP_index,user_antenna_pair) = 0; % Signal_power_fromBS_user(user_index,:,EIRP_index)
                     else
                         % シャドーイングの値をsqrt(Shadowing_var_Macro).*randn(1,1)とし，毎ユーザで値を変える
                         % 基地局・ユーザの干渉
@@ -282,6 +283,7 @@ for Drop_index = 1:NO_drop_trial
                 end
             end
         end
+        %toc
         
         Max_PFmetric_RB_Conv = zeros(Timing_interval,NO_RB);
         %Capacity_Analyze_band_ave_macro_Conv = zeros(Timing_interval,NO_user); % ？
@@ -289,6 +291,7 @@ for Drop_index = 1:NO_drop_trial
         
         for Timing_interval_index = 1:Timing_interval
             %% PFmetric計算
+            tic
             Max_CC_modulation = zeros(NO_user,NO_RB,(NO_cell+1)^NO_user);
             modulation_index = zeros(NO_user,NO_RB,(NO_cell+1)^NO_user);
             select_usermod = zeros(NO_RB,NO_user);
@@ -318,7 +321,7 @@ for Drop_index = 1:NO_drop_trial
                     end
                 end
             end
-            
+            toc
             
             %% 容量計算 (従来方式)
             %Capacity_trial_realnear_prop = 0;
@@ -394,5 +397,5 @@ for Drop_index = 1:NO_drop_trial
     end 
     % end of trials
     %disp("end of trials");
-    toc
+    %toc
 end

@@ -1,4 +1,4 @@
-function impossible_list = create_impossible_pairs( num_users, num_cells )
+function [pairs, impossible_pairs] = create_pairs( num_users, num_cells )
 % Function that creates all the impossible(*) antenna pairs.
 %
 % * impossible meaning, pairs that aren't allowed
@@ -13,7 +13,7 @@ pair_per_user = num_cells + 1;      % total number of choices
 total_combinations = pair_per_user^num_users;       % total number of combinations
 
 %% Simulation:
-impossible_list = zeros(1, total_combinations);
+impossible_pairs = zeros(1, total_combinations);
 count = 1;
 user_pairing = zeros(1,num_users);
 
@@ -28,11 +28,11 @@ for pair = 1:total_combinations
     
     if user_pairing(1) ~= pair_per_user
         if user_pairing(1) == user_pairing(2)
-            impossible_list(count) = pair;
+            impossible_pairs(count) = pair;
             count = count + 1;
             continue;
         elseif user_pairing(1) == user_pairing(3)
-            impossible_list(count) = pair;
+            impossible_pairs(count) = pair;
             count = count + 1;
             continue;
         end
@@ -41,7 +41,7 @@ for pair = 1:total_combinations
     
     if user_pairing(2) ~= pair_per_user
         if user_pairing(2) == user_pairing(3)
-            impossible_list(count) = pair;
+            impossible_pairs(count) = pair;
             count = count + 1;
             continue;
         end
@@ -49,14 +49,18 @@ for pair = 1:total_combinations
     
     % When every user doesn't connect to anything:
     if user_pairing(1) == pair_per_user && user_pairing(2) == pair_per_user && user_pairing(3) == pair_per_user
-        impossible_list(count) = pair;
+        impossible_pairs(count) = pair;
         count = count + 1;
         continue;
     end 
 end
 
 % remove unwanted zeros:
-impossible_list( impossible_list == 0) = [];
+impossible_pairs( impossible_pairs == 0) = [];
+
+% remove impossible pairs 
+pairs = 1:512;
+pairs(ismember(pairs, impossible_pairs) == 1) = [];
 
 end
 

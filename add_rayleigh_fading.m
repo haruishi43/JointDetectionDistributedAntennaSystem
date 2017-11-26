@@ -35,18 +35,12 @@ delay_profile = delay_profile / sum(delay_profile);
 
 %% Add Rayleigh Fading:
 channel_response_time = zeros(num_user, num_cell, num_sc);
-channel_response_freq = zeros(num_user, num_cell, num_sc);
-for user = 1:num_user
-    for cell = 1:num_cell
-        % 1 ~ # of paths:
-        channel_response_time(user, cell, 1:num_paths) = ( 1/sqrt(2).*( randn(num_paths, 1) + 1i*randn(num_paths, 1) ) ) .* sqrt(delay_profile);
-        % # of paths +1 ~ # of subcarriers:
-        channel_response_time(user, cell, (num_paths+1):num_sc) = zeros( 1, 1, (num_sc - num_paths) );
-        
-        % calculate frequency:
-        channel_response_freq(user, cell, :) = fft( channel_response_time(user, cell, :) );
-    end
-end
+
+% add delay to the first 6
+channel_response_time(:, :, 1:num_paths) = reshape(repmat(repmat(( 1/sqrt(2).*( randn(1, num_paths) + 1i*randn(1, num_paths) ) ) .* sqrt(delay_profile)', [num_cell, 1]), [num_user, 1]), [3, 7, 6]);
+
+% calculate the frequency
+channel_response_freq = fft(channel_response_time, num_sc, 3);
 
 end
 
