@@ -1,7 +1,7 @@
 clear;
 load('CCCtable_2antenna');
 
-%% Randomiz:
+%% Randomize:
 rng('shuffle');
 
 %% Model parameters:
@@ -19,6 +19,7 @@ band = band_per_rb * num_rb;        % total frequency band
 num_drops = 30;
 time_interval = 60;
 trial_per_drop = 1;
+saving = 1;
 
 %% Initializing variables:
 plr_from_bs_all = zeros(num_drops,num_cell,num_users);              % packet loss ratio 
@@ -28,7 +29,6 @@ impossible_list = create_impossible_pairs( num_users, num_cell );   % impossible
 
 
 %% シミュレーション条件 %% old
-
 Shadowing_ave = 0;                   % Shadowingの平均値
 Shadowing_var_Macro = 8;             % MacroBS Shadowingの分散値（？）
 Shadowing_var_Pico = 10;             % PicoBS Shadowingの分散値（？）
@@ -37,38 +37,40 @@ NO_EIRP_base = 1;                    % MacroBS放射電力制御係数
 
 
 %% Saving to Folder %%
+if saving == 1
+    % remove a couple of data in the beginning 
+    remove_beginning = 20;
+    % we will use the actual_interval
+    actual_interval = time_interval - remove_beginning;
+    % trial count
+    trial_count = 1;
 
-% remove a couple of data in the beginning 
-remove_beginning = 20;
-% we will use the actual_interval
-actual_interval = time_interval - remove_beginning;
-% trial count
-trial_count = 1;
+    % for each NO_time_trial we save, 
+    % input data:
+    channel_response = zeros(num_rb, num_users, num_cell);
+    past_throughput = zeros(num_users, 1);
+    % label data:
+    combination = zeros(num_rb, 1);
+    % other data:
+    sumrate = 0;
+    % which means we get actual_interval as the number of data points per each
+    % NO_time_trail
 
-% for each NO_time_trial we save, 
-% input data:
-channel_response = zeros(num_rb, num_users, num_cell);
-past_throughput = zeros(num_users, 1);
-% label data:
-combination = zeros(num_rb, 1);
-% other data:
-sumrate = 0;
-% which means we get actual_interval as the number of data points per each
-% NO_time_trail
+    % for saving, we divide the data for each NO_time_trail
 
-% for saving, we divide the data for each NO_time_trail
-
-% create the main folder for saving:
-data_folder_name = datestr(datetime('now', 'TimeZone','local','Format','y-MM-dd_HH:mm:ss'), 'yyyy-mm-dd_HH-MM-SS');
-[status, msg] = mkdir(data_folder_name);
-if status ~= 1
-    disp(msg);
+    % create the main folder for saving:
+    data_folder_name = datestr(datetime('now', 'TimeZone','local','Format','y-MM-dd_HH:mm:ss'), 'yyyy-mm-dd_HH-MM-SS');
+    [status, msg] = mkdir(data_folder_name);
+    if status ~= 1
+        disp(msg);
+    end
+    % change directory:
+    % home: starting directory
+    %home = cd(data_folder_name); 
+    home = pwd;
+    data_root = fullfile(home, data_folder_name);
 end
-% change directory:
-% home: starting directory
-%home = cd(data_folder_name); 
-home = pwd;
-data_root = fullfile(home, data_folder_name);
+
 
 %% More Variables 
 
@@ -79,8 +81,6 @@ SINR_RB_user = zeros(num_users,num_rb,NO_EIRP_base);
 SINR_RB_user_floor = zeros (num_users,num_rb,NO_EIRP_base);
 
 Capacity_byuser_macro_Conv = zeros(num_users,NO_EIRP_base,num_drops);                                   
-
-
 
 Signal_power_fromBS_user = zeros(num_users,num_sc,NO_EIRP_base,(num_cell+1)^num_users);
 Signal_power_fromBS_Interference_user = zeros(num_users,num_sc,NO_EIRP_base,(num_cell+1)^num_users);
@@ -279,23 +279,24 @@ for drop = 1:num_drops
         % end of timing_interval
         
         %% saving data
-        dir_trial_name = int2str(trial_count);
-        basename = fullfile(data_root, dir_trial_name);
-        [status, msg] = mkdir(basename);
-        if status ~= 1
-            disp(msg); % if any error
+        if saving == 1
+            dir_trial_name = int2str(trial_count);
+            basename = fullfile(data_root, dir_trial_name);
+            [status, msg] = mkdir(basename);
+            if status ~= 1
+                disp(msg); % if any error
+            end
+            cd(basename);
+
+            save('channel_response.mat', 'channel_response');
+            save('combination.mat', 'combination');
+            save('past_throughput.mat', 'past_throughput');
+            save('sumrate.mat', 'sumrate');
+
+            % clean up:
+            trial_count = trial_count + 1;
+            cd(home) 
         end
-        cd(basename);
-        
-        save('channel_response.mat', 'channel_response');
-        save('combination.mat', 'combination');
-        save('past_throughput.mat', 'past_throughput');
-        save('sumrate.mat', 'sumrate');
-        
-        % clean up:
-        trial_count = trial_count + 1;
-        cd(home)
-        
     end 
     % end of trials
     %disp("end of trials");
