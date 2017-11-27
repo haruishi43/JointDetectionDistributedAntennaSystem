@@ -98,18 +98,16 @@ for drop = 1:num_drops
     %% Create Coordinates for each user:
     user_coordinates = create_user_coordinates( antenna_coordinates );
     
-    
     %% Calculate Packet Loss Ratio
     plr_from_bs_all(drop, :, :) = create_plr_from_bs( antenna_coordinates, user_coordinates );
     
-    
     %% Simulation loop (trial per drop):
     for trial = 1:trial_per_drop
+        tic
         Capacity_band_ave_macro_Conv = zeros(1, num_users);    % Band–ˆ‚Ì•½‹ÏCapacity‚ðŠi”[
         
         %% Calculate Rayleigh Fading:
         channel_response_freq = add_rayleigh_fading( num_users, num_cell );
-        
         
         %% Average to create channel response (for saving purpose):
         for user = 1:num_users

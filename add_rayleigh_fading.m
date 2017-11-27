@@ -47,6 +47,5 @@ for user = 1:num_user
         channel_response_freq(user, cell, :) = fft( channel_response_time(user, cell, :) );
     end
 end
-
 end
 
