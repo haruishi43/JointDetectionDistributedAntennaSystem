@@ -22,7 +22,6 @@ rnd = -174;                         % Reciever Noise Density
 num_drops = 1;
 time_interval = 10;
 trial_per_drop = 1;
-saving = 1;
 
 %% Initializing variables:
 plr_from_bs_all = zeros(num_drops,num_cell,num_users);              % packet loss ratio 
@@ -60,6 +59,9 @@ for drop = 1:num_drops
         
         
         
+        for user = 1:num_users
+            
+        end
         
     end
     
