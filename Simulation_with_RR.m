@@ -17,7 +17,7 @@ band = band_per_rb * num_rb;        % total frequency band
 
 %% Simulation parameters:
 num_drops = 30;
-time_interval = 100;
+time_interval = 60;
 trial_per_drop = 1;
 
 %% Initializing variables:
@@ -47,10 +47,10 @@ trial_count = 1;
 
 % for each NO_time_trial we save, 
 % input data:
-channel_response = zeros(NO_RB, num_users, num_cell);
+channel_response = zeros(num_rb, num_users, num_cell);
 past_throughput = zeros(num_users, 1);
 % label data:
-combination = zeros(NO_RB, 1);
+combination = zeros(num_rb, 1);
 % other data:
 sumrate = 0;
 % which means we get actual_interval as the number of data points per each
@@ -75,8 +75,8 @@ data_root = fullfile(home, data_folder_name);
 SINR_SC_user = zeros(num_users,num_sc,(num_cell+1)^num_users );
 SINR_SC_user_floor = zeros(num_users,num_sc,(num_cell+1)^num_users);
 EIRP_base = zeros(1,NO_EIRP_base);
-SINR_RB_user = zeros(num_users,NO_RB,NO_EIRP_base);
-SINR_RB_user_floor = zeros (num_users,NO_RB,NO_EIRP_base);
+SINR_RB_user = zeros(num_users,num_rb,NO_EIRP_base);
+SINR_RB_user_floor = zeros (num_users,num_rb,NO_EIRP_base);
 
 Capacity_byuser_macro_Conv = zeros(num_users,NO_EIRP_base,num_drops);                                   
 
@@ -105,14 +105,14 @@ for drop = 1:num_drops
     
     %% Simulation loop (trial per drop):
     for trial = 1:trial_per_drop
-        Capacity_band_ave_macro_Conv = zeros(1, num_user);    % BandñàÇÃïΩãœCapacityÇäiî[
+        Capacity_band_ave_macro_Conv = zeros(1, num_users);    % BandñàÇÃïΩãœCapacityÇäiî[
         
         %% Calculate Rayleigh Fading:
         channel_response_freq = add_rayleigh_fading( num_users, num_cell );
         
         
         %% Average to create channel response (for saving purpose):
-        for user = 1:num_user
+        for user = 1:num_users
             for cell = 1:num_cell
                for rb = 1:num_rb
                     channel_response(rb, user, cell) = abs(mean(channel_response_freq(user, cell, num_sc_in_rb * (rb-1) + 1:num_sc_in_rb * rb)));
@@ -159,7 +159,7 @@ for drop = 1:num_drops
         EIRP_index = 1;
         for user_antenna_pair = 1:(num_cell+1)^num_users
             for user_index = 1:num_users
-               for RB_index = 1:NO_RB
+               for RB_index = 1:num_rb
                    % average
                     SINR_RB_user(user_index,RB_index,user_antenna_pair) = mean(SINR_SC_user(user_index,num_sc_in_rb*(RB_index-1)+1:num_sc_in_rb*RB_index,user_antenna_pair));
                     SINR_RB_user_floor(user_index,RB_index,user_antenna_pair) = floor(SINR_RB_user(user_index,RB_index,user_antenna_pair));
@@ -190,16 +190,16 @@ for drop = 1:num_drops
             end
         end
         
-        Max_PFmetric_RB_Conv = zeros(time_interval,NO_RB);
+        Max_PFmetric_RB_Conv = zeros(time_interval,num_rb);
         %Capacity_Analyze_band_ave_macro_Conv = zeros(Timing_interval,NO_user); % ÅH
-        select_user_antenna_pair = zeros(1,NO_RB);
+        select_user_antenna_pair = zeros(1,num_rb);
         
         for Timing_interval_index = 1:time_interval
             %% PFmetricåvéZ
-            Max_CC_modulation = zeros(num_users,NO_RB,(num_cell+1)^num_users);
-            modulation_index = zeros(num_users,NO_RB,(num_cell+1)^num_users);
-            select_usermod = zeros(NO_RB,num_users);
-            for RB_index = 1:NO_RB
+            Max_CC_modulation = zeros(num_users,num_rb,(num_cell+1)^num_users);
+            modulation_index = zeros(num_users,num_rb,(num_cell+1)^num_users);
+            select_usermod = zeros(num_rb,num_users);
+            for RB_index = 1:num_rb
                 EIRP_index = 1;
                 PFmetric_RB_Conv = zeros(1,(num_cell+1)^num_users);
                 for user_antenna_pair = 1:(num_cell+1)^num_users
@@ -255,7 +255,7 @@ for drop = 1:num_drops
             % at 60
             if Timing_interval_index == 60
                 % Get combination (base 10 to base 8)
-                for rb_index= 1:NO_RB
+                for rb_index= 1:num_rb
                     a1 = floor((select_user_antenna_pair(1, rb_index)-1)/64) + 1;
                     tmp = mod((select_user_antenna_pair(1, rb_index)-1), 64);
                     a2 = floor(tmp/8) + 1;
