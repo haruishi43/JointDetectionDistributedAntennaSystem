@@ -58,9 +58,42 @@ for drop = 1:num_drops
         
         
         
+        current_user = 1;
+        connection = zeros(num_rb, num_users);
         
-        for user = 1:num_users
+        for rb = 1:num_rb
+            % channel response of the rb
+            cr = channel_response(:, :, rb);
             
+            cr_user = cr(current_user, :);
+            
+            [value, index] = max(cr_user);
+            
+            % current user connects first
+            connection(rb, current_user) = index;
+            
+            % append interference from first user and BS
+            
+            
+            for user = 1:num_users
+                if user ~= current_user
+                    
+                    cr_user = cr(user, :);
+                    [value, index] = max(cr_user);
+                    % when do I not connect?
+                    connection(rb, user) = index;
+                    
+                    % append interference from user and BS
+                    
+                    
+                end
+            end
+
+            % increment
+            current_user = current_user + 1;
+            if current_user > 3
+                current_user = 0;
+            end
         end
         
     end
