@@ -38,7 +38,7 @@ for drop = 1:num_drops
     %% Create Coordinates for each user:
     user_coordinates = create_user_coordinates( antenna_coordinates, 3, 500, preset_coordinates );
     
-    %% Calculate Packet Loss Ratio
+    %% Calculate Propagation Loss 
     plr_from_bs_all(drop, :, :) = create_plr_from_bs( antenna_coordinates, user_coordinates );
     
     %% Simulation loop (trial):
@@ -48,52 +48,60 @@ for drop = 1:num_drops
         channel_response_freq = add_rayleigh_fading( num_users, num_cell );
         
         %% Average to create channel response for each RB:
+        signal_power = zeros(num_users, num_cell, num_rb);
+        eirp = 0 + 30 - (rnd + 10*log10(band));
         for user = 1:num_users
             for cell = 1:num_cell
-               for rb = 1:num_rb
+                
+                const = 10.^(( eirp  - plr_from_bs_all(drop, cell, user) ) / 10);
+                
+                for rb = 1:num_rb
+                    
                     channel_response(user, cell, rb) = abs(mean(channel_response_freq(user, cell, num_sc_in_rb * (rb-1) + 1:num_sc_in_rb * rb)));
-               end
+
+                    signal_power(user, cell, rb) = sqrt(shadowing_var)*randn(1,1) * const * ( abs(channel_response(user, cell, rb)).^2 );
+
+                end
             end
         end 
         
+        % create pattern for 3 user (max 2 connected)
+        n = 3; k = 2;
+        nk = nchoosek(1:n,k);
+        comb = zeros(0,k);
+        for i=1:size(nk,1)
+            pi = perms(nk(i,:));
+            comb = unique([comb; pi],'rows');
+        end
         
-        
-        current_user = 1;
-        connection = zeros(num_rb, num_users);
+        tot_comb = numel(comb(:,1));
+        current_comb = 1;
+        connection = 8 * ones(num_rb, num_users);
         
         for rb = 1:num_rb
-            % channel response of the rb
-            cr = channel_response(:, :, rb);
+            % signal of the rb
+            cs = signal_power(:, :, rb);
             
-            cr_user = cr(current_user, :);
+            cc = comb(current_comb,:);
             
-            [value, index] = max(cr_user);
-            
-            % current user connects first
-            connection(rb, current_user) = index;
-            
-            % append interference from first user and BS
-            
-            
-            for user = 1:num_users
-                if user ~= current_user
-                    
-                    cr_user = cr(user, :);
-                    [value, index] = max(cr_user);
-                    % when do I not connect?
+            for user = cc
+                
+                cs_user = cs(user, :);
+                [~, index] = max(cs_user);
+                
+                used = find(index == connection(rb, :));
+                if isempty(used) == 1
                     connection(rb, user) = index;
-                    
-                    % append interference from user and BS
-                    
-                    
                 end
-            end
+                
+            end  
 
             % increment
-            current_user = current_user + 1;
-            if current_user > 3
-                current_user = 0;
+            current_comb = current_comb + 1;
+            if current_comb > tot_comb
+                current_comb = 1;
             end
+            
         end
         
     end

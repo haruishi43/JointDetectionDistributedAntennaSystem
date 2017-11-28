@@ -1,5 +1,5 @@
 function plr_from_bs = create_plr_from_bs( antenna_coordinates, user_coordinates )
-% PLR (Packet Loss Ratio)
+% Propagation Loss Ratio
 %
 % Packet loss occurs when one or more packets of data travelling across a
 % network fails to reach their destination.
