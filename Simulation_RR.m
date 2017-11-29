@@ -1,7 +1,7 @@
 clear;
 
 %% Randomize:
-%rng('Shuffle');
+rng('Shuffle');
 
 %% Model parameters:
 num_users = 3;                      % # of users
