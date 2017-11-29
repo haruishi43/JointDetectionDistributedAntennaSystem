@@ -73,10 +73,10 @@ for drop = 1:num_drops
         current_comb = 1;
         connection = 8 * ones(num_rb, num_users);
         
-        signal_floor = zeros(num_rb, 2);  % 2 users at a time
-        interference_floor = zeros(num_rb, 2);
+        signal = zeros(num_rb, 2);  % 2 users at a time
+        interference = zeros(num_rb, 2);
         alpha = zeros(num_rb, 2);
-        power = zeros(num_rb, 1);
+        power
         
         for rb = 1:num_rb
             % signal of the rb

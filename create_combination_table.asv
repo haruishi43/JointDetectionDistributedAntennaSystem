@@ -1,0 +1,8 @@
+function [lis, tot] = create_combination_table(inputArg1,inputArg2)
+% Creates a list of all the permutations given size and r
+
+
+
+
+end
+
