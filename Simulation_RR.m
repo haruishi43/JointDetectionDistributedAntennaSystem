@@ -85,6 +85,7 @@ for drop = 1:num_drops
         power_floor = zeros(num_rb, num_select);
         alpha_floor = zeros(num_rb, num_select);
         modulation = zeros(num_rb, num_select);
+        modulation_jd = zeros(num_rb, num_select);
         ccc_output = zeros(num_rb, num_select);
         ccc_output_jd = zeros(num_rb, num_select);
         
@@ -176,10 +177,10 @@ for drop = 1:num_drops
             [~, index] = max(tot_mod_list(:));
             [row, col] = ind2sub(size(tot_mod_list), index);
             
-            modulation(rb, :) = [col, row];
+            modulation_jd(rb, :) = [col, row];
             
-            ccc_output_jd(rb, 1) = CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, 10*fix(1-alpha_floor(rb, 1)) + 1, modulation(rb, 2), modulation(rb, 1));
-            ccc_output_jd(rb, 2) = CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, 10*fix(1-alpha_floor(rb, 2)) + 1, modulation(rb, 1), modulation(rb, 2));
+            ccc_output_jd(rb, 1) = CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, 10*fix(1-alpha_floor(rb, 1)) + 1, modulation_jd(rb, 2), modulation_jd(rb, 1));
+            ccc_output_jd(rb, 2) = CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, 10*fix(1-alpha_floor(rb, 2)) + 1, modulation_jd(rb, 1), modulation_jd(rb, 2));
             
             % increment
             current_comb = current_comb + 1;
