@@ -140,7 +140,7 @@ for drop = 1:num_drops
                         for user_index_int = 1:num_users
                             if user_index_int ~= user_index
                                 % シャドーイングの値をsqrt(Shadowing_var_Macro).*randn(1,1)とし，毎ユーザで値を変える
-                                % ユーザ同士の干渉
+                                % 干渉
                                 % Interference
                                 Signal_power_fromBS_Interference_user(user_index_int,:,EIRP_index,user_antenna_pair) = squeeze(Signal_power_fromBS_Interference_user(user_index_int,:,EIRP_index,user_antenna_pair)).' + abs(sqrt(Shadowing_var_Macro).*10^(randn(1,1)) * 10.^((EIRP_base(EIRP_index) - repmat(plr_from_bs_all(drop,cell_index_select,user_index_int)',num_sc,1))/10) .* (abs(squeeze(channel_response_freq(user_index_int,cell_index_select,:))).^2));    %マクロBSからの受信電力
                             end

@@ -38,7 +38,7 @@ channel_response_freq = zeros(num_users, num_cell, num_sc);         % channel re
 channel_response = zeros(num_users, num_cell, num_rb);
 
 %% Create coordinates for each BS:
-preset_coordinates = [2 4 6]; % For Coordinate Testing
+preset_coordinates = [1 1 1]; % For Coordinate Testing
 antenna_coordinates = create_bs_coordinate();
 
 %% Simulation loop (change user placement):   
@@ -75,9 +75,9 @@ for drop = 1:num_drops
         end 
         
         %% Round-Robin scheduling with Max-C
+        tic
         current_comb = 1;
         connection = 8 * ones(num_rb, num_users);
-        
         
         signal = zeros(num_rb, num_select, num_select); % 1 is main signal, 2 is interference
         power = zeros(num_rb, num_select);
@@ -86,6 +86,7 @@ for drop = 1:num_drops
         alpha_floor = zeros(num_rb, num_select);
         modulation = zeros(num_rb, num_select);
         ccc_output = zeros(num_rb, num_select);
+        ccc_output_jd = zeros(num_rb, num_select);
         
         for rb = 1:num_rb
             % signal of the rb
@@ -159,13 +160,26 @@ for drop = 1:num_drops
             mod_list2 = squeeze(CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, 10*fix(1-alpha_floor(rb, 2)) + 1, :, :));
             
             tot_mod_list = mod_list1 + mod_list2';
-            [value, index] = max(tot_mod_list(:));
+            [~, index] = max(tot_mod_list(:));
             [row, col] = ind2sub(size(tot_mod_list), index);
             
             modulation(rb, :) = [col, row];
             
             ccc_output(rb, 1) = CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, 10*fix(1-alpha_floor(rb, 1)) + 1, modulation(rb, 2), modulation(rb, 1));
             ccc_output(rb, 2) = CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, 10*fix(1-alpha_floor(rb, 2)) + 1, modulation(rb, 1), modulation(rb, 2));
+            
+            % for jd
+            mod_list1 = squeeze(CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, 10*fix(1-alpha_floor(rb, 1)) + 1, :, :));
+            mod_list2 = squeeze(CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, 10*fix(1-alpha_floor(rb, 2)) + 1, :, :));
+            
+            tot_mod_list = mod_list1 + mod_list2';
+            [~, index] = max(tot_mod_list(:));
+            [row, col] = ind2sub(size(tot_mod_list), index);
+            
+            modulation(rb, :) = [col, row];
+            
+            ccc_output_jd(rb, 1) = CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, 10*fix(1-alpha_floor(rb, 1)) + 1, modulation(rb, 2), modulation(rb, 1));
+            ccc_output_jd(rb, 2) = CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, 10*fix(1-alpha_floor(rb, 2)) + 1, modulation(rb, 1), modulation(rb, 2));
             
             % increment
             current_comb = current_comb + 1;
@@ -174,9 +188,12 @@ for drop = 1:num_drops
             end
         end
         
+        for rb = 1:num_rb
+            
+        end
         
-        
-        
+        toc
+
     end
     
 end
