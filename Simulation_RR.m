@@ -38,14 +38,14 @@ channel_response_freq = zeros(num_users, num_cell, num_sc);         % channel re
 channel_response = zeros(num_users, num_cell, num_rb);
 
 %% Create coordinates for each BS:
-preset_coordinates = [1 1 1]; % For Coordinate Testing
+preset_coordinates = [1 3 6]; % For Coordinate Testing (has to chnage when num_users change)
 antenna_coordinates = create_bs_coordinate();
 
 %% Simulation loop (change user placement):   
 for drop = 1:num_drops
     
     %% Create Coordinates for each user:
-    user_coordinates = create_user_coordinates( antenna_coordinates, 3, 500, preset_coordinates );
+    user_coordinates = create_user_coordinates( antenna_coordinates, num_users, 500, preset_coordinates );
     
     %% Calculate Propagation Loss 
     plr_from_bs_all(drop, :, :) = create_plr_from_bs( antenna_coordinates, user_coordinates );
@@ -65,10 +65,12 @@ for drop = 1:num_drops
                 
                 for rb = 1:num_rb
                     
-                    channel_response(user, cell, rb) = abs(mean(channel_response_freq(user, cell, num_sc_in_rb * (rb-1) + 1:num_sc_in_rb * rb)));
+                    % channel response (average of all subcarriers in a
+                    % resource block
+                    channel_response(user, cell, rb) = mean( channel_response_freq( user, cell, num_sc_in_rb * (rb-1) + 1:num_sc_in_rb * rb ) );
 
                     % signal in real number domain
-                    all_signal_power(user, cell, rb) = sqrt(shadowing_var)*10^(randn(1,1)) * const * ( abs(channel_response(user, cell, rb)).^2 );
+                    all_signal_power(user, cell, rb) = sqrt(shadowing_var)*10^( randn(1,1) ) * const * ( abs( channel_response(user, cell, rb) ).^2 );
 
                 end
             end
@@ -90,69 +92,19 @@ for drop = 1:num_drops
         ccc_output_jd = zeros(num_rb, num_select);
         
         for rb = 1:num_rb
-            % signal of the rb
-            cs = all_signal_power(:, :, rb);
-            
-            cc = combination_table(current_comb,:);
-            
-            % users
-            user1 = cc(1);
-            user2 = cc(2);
-            
-            % max-c (best signal power is chosen)
-            cs_user = cs(user1, : );
-            [s, index] = max( cs_user );
-            
-            connection(rb, user1) = index;
-            signal(rb, 1, 1) = s;
-            signal(rb, 2, 2) = cs(user2, index);
-            
-            % add to power (to dB)
-            % noise is already calculated through rnd
-            power(rb, 1) = 10*log10(abs(s));
-            power(rb, 2) = 10*log10(abs(signal(rb, 2, 2)));
-            
-            cs_user = cs(user2, :);
-            [s, index] = max( cs_user );
-            
-            % find if the DA is already being used or not
-            used = find(index == connection(rb, :));
-            if isempty(used) == 1
-                connection(rb, user2) = index;
-                
-                signal(rb, 2, 1) = s;
-                signal(rb, 1, 2) = cs(user1, index);
-                
-                power(rb, 2) = power(rb, 2) + 10*log10(abs(s));
-                power(rb, 1) = power(rb, 1) + 10*log10(abs(signal(rb, 1, 2)));
-            end
+            % rr with max-c
+            [ signal(rb, :, :), power(rb, :), connection(rb, :) ] = rr_max_c( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb) );
                
-            % calculate alpha
-            alpha1 = signal(rb, 1, 1) / (signal(rb, 1, 1) + signal(rb, 1, 2));    
-            alpha2 = signal(rb, 2, 1) / (signal(rb, 2, 1) + signal(rb, 2, 2));
+            % calculate alpha and floor it
+            [ alpha_floor(rb, :), alpha(rb, :) ] = calculate_alpha( squeeze( signal(rb, :, :) ) );
             
-            if isnan(alpha1)
-                alpha1 = 1;
-            end
-            if isnan(alpha2)
-                alpha2 = 1;
-            end
-            
-            alpha(rb, :) = [alpha1 alpha2];
-            
-            
-            % floor P/N and alpha
+            % floor P/N
             for i = 1:num_select
                 power_floor(rb, i) = floor(power(rb, i));
-                alpha_floor(rb, i) = round(alpha(rb, i), 1);
                 if power_floor(rb, i) >= 30
                     power_floor(rb, i) = 30;
                 elseif power_floor(rb, i) <= -10
                     power_floor(rb, i) = -10;
-                end
-                
-                if alpha_floor(rb, i) > 1.0
-                    alpha_floor(rb, i) = 1;
                 end
             end
             
@@ -187,10 +139,6 @@ for drop = 1:num_drops
             if current_comb > tot_combinations
                 current_comb = 1;
             end
-        end
-        
-        for rb = 1:num_rb
-            
         end
         
         toc
