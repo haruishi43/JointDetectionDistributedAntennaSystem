@@ -1,4 +1,5 @@
 clear;
+load('CCCtable_2antenna');
 
 %% Randomize:
 rng('Shuffle');
@@ -14,10 +15,17 @@ num_sc = num_rb * num_sc_in_rb;     % # of total subcarriers
 band_per_rb = 180*10^3;             % frequency band range for each rb (Hz)
 band = band_per_rb * num_rb;        % total frequency band
 
+
+
 shadowing_ave = 0;
 shadowing_var = 8;
 rnd = -174;                         % Reciever Noise Density
+noise_power = 1;
 eirp = 0 + 30 - (rnd + 10*log10(band));
+
+% Scheduling parameters
+num_select = 2;                     % # of user selected for each combination
+[combination_table, tot_combinations] = create_combination_table(num_users, num_select);
 
 %% Simulation parameters:
 num_drops = 1;
@@ -30,12 +38,8 @@ channel_response_freq = zeros(num_users, num_cell, num_sc);         % channel re
 channel_response = zeros(num_users, num_cell, num_rb);
 
 %% Create coordinates for each BS:
-preset_coordinates = [1 2 7]; % For Coordinate Testing
+preset_coordinates = [1 2 3]; % For Coordinate Testing
 antenna_coordinates = create_bs_coordinate();
-
-%% Create combination table:
-% selecting 2 users
-[combination_table, tot_combinations] = create_combination_table(num_users, 2);
 
 %% Simulation loop (change user placement):   
 for drop = 1:num_drops
@@ -63,6 +67,7 @@ for drop = 1:num_drops
                     
                     channel_response(user, cell, rb) = abs(mean(channel_response_freq(user, cell, num_sc_in_rb * (rb-1) + 1:num_sc_in_rb * rb)));
 
+                    % signal in real number domain
                     all_signal_power(user, cell, rb) = sqrt(shadowing_var)*randn(1,1) * const * ( abs(channel_response(user, cell, rb)).^2 );
 
                 end
@@ -73,10 +78,13 @@ for drop = 1:num_drops
         current_comb = 1;
         connection = 8 * ones(num_rb, num_users);
         
-        signal_floor = zeros(num_rb, 2);  % 2 users at a time
-        interference_floor = zeros(num_rb, 2);
-        alpha = zeros(num_rb, 2);
+        signal = zeros(num_rb, num_select);
         power = zeros(num_rb, 1);
+        alpha = zeros(num_rb, num_select);
+        power_floor = zeros(num_rb, 1);
+        alpha_floor = zeros(num_rb, num_select);
+        modulation = zeros(num_rb, num_select);
+        ccc_output = zeros(num_rb, num_select);
         
         for rb = 1:num_rb
             % signal of the rb
@@ -84,21 +92,63 @@ for drop = 1:num_drops
             
             cc = combination_table(current_comb,:);
             
-            for user = cc
+            for i = 1:num_select
+                user = cc(i);
+
+                % max-c (best signal power is chosen)
+                cs_user = cs(user, : );
+                [s, index] = max( cs_user );
                 
-                cs_user = cs(user, :);
-                [~, index] = max(cs_user);
-                
+                % find if the DA is already being used or not
                 used = find(index == connection(rb, :));
                 if isempty(used) == 1
                     connection(rb, user) = index;
+                    
+                    % add to signal
+                    signal(rb, i) = s;
+                    
+                    % add to power (to dB)
+                    % noise is already calculated through rnd
+                    power(rb) = power(rb) + 10*log10(abs(s));
                 end
-                
-            end  
-
+            end    
+            
+            % calculate alpha
+            s1 = signal(rb, 1);    s2 = signal(rb, 2);
+            alpha1 = abs(s1) / abs(s1 + s2);    alpha2 = abs(s2) / abs(s1 + s2);
+            
+            if isnan(alpha1)
+                alpha1 = 1;
+            end
+            if isnan(alpha2)
+                alpha2 = 1;
+            end
+            
+            alpha(rb, :) = [alpha1 alpha2];
             
             
+            % floor P/N and alpha
+            power_floor(rb) = floor(power(rb));
+            if power_floor(rb) >= 30
+                power_floor(rb) = 30;
+            elseif power_floor(rb) <= -10
+                power_floor(rb) = -10;
+            end
+            % round down
+            alpha_floor(rb, :) = floor(10*alpha(rb, :)) / 10;
             
+            % find the best modulation
+            mod_list1 = squeeze(CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb) + 11, 10*alpha_floor(rb, 1) + 1, :, :));
+            mod_list2 = squeeze(CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb) + 11, 10*alpha_floor(rb, 2) + 1, :, :));
+            
+            tot_mod_list = mod_list1 + mod_list2';
+            [value, index] = max(tot_mod_list(:));
+            [row, col] = ind2sub(size(tot_mod_list), index);
+            
+            modulation(rb, :) = [col, row];
+            
+            ccc_output(rb, 1) = CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb) + 11, 10*alpha_floor(rb, 1) + 1, modulation(rb, 2), modulation(rb, 1));
+            ccc_output(rb, 2) = CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb) + 11, 10*alpha_floor(rb, 2) + 1, modulation(rb, 1), modulation(rb, 2));
             
             % increment
             current_comb = current_comb + 1;
@@ -106,6 +156,7 @@ for drop = 1:num_drops
                 current_comb = 1;
             end
         end
+        
         
         
         

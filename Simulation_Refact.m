@@ -120,7 +120,7 @@ for drop = 1:num_drops
         
         
         %% SINRŒvŽZ %%
-        Noise_power = 1;   
+        Noise_power = 1;   % eirp ‚ÅŽg‚¤ƒmƒCƒY‚Ì•ªŽU
         EIRP_index = 1;
         EIRP_base(EIRP_index) = 0 + 30 - (Receiver_noise_density + 10*log10(band));       
         for user_antenna_pair = 1:(num_cell+1)^num_users 
