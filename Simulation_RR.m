@@ -93,7 +93,7 @@ for drop = 1:num_drops
             
             cc = combination_table(current_comb,:);
             
-            % first user
+            % users
             user1 = cc(1);
             user2 = cc(2);
             
@@ -125,7 +125,6 @@ for drop = 1:num_drops
                 power(rb, 1) = power(rb, 1) + 10*log10(abs(signal(rb, 1, 2)));
             end
                
-            
             % calculate alpha
             alpha1 = signal(rb, 1, 1) / (signal(rb, 1, 1) + signal(rb, 1, 2));    
             alpha2 = signal(rb, 2, 1) / (signal(rb, 2, 1) + signal(rb, 2, 2));
@@ -143,19 +142,21 @@ for drop = 1:num_drops
             % floor P/N and alpha
             for i = 1:num_select
                 power_floor(rb, i) = floor(power(rb, i));
+                alpha_floor(rb, i) = round(alpha(rb, i), 1);
                 if power_floor(rb, i) >= 30
                     power_floor(rb, i) = 30;
                 elseif power_floor(rb, i) <= -10
                     power_floor(rb, i) = -10;
                 end
+                
+                if alpha_floor(rb, i) > 1.0
+                    alpha_floor(rb, i) = 1;
+                end
             end
             
-            % round down
-            alpha_floor(rb, :) = floor(10*alpha(rb, :)) / 10;
-            
             % find the best modulation
-            mod_list1 = squeeze(CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, 10*alpha_floor(rb, 1) + 1, :, :));
-            mod_list2 = squeeze(CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, 10*alpha_floor(rb, 2) + 1, :, :));
+            mod_list1 = squeeze(CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, 10*fix(1-alpha_floor(rb, 1)) + 1, :, :));
+            mod_list2 = squeeze(CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, 10*fix(1-alpha_floor(rb, 2)) + 1, :, :));
             
             tot_mod_list = mod_list1 + mod_list2';
             [value, index] = max(tot_mod_list(:));
@@ -163,8 +164,8 @@ for drop = 1:num_drops
             
             modulation(rb, :) = [col, row];
             
-            ccc_output(rb, 1) = CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb) + 11, 10*alpha_floor(rb, 1) + 1, modulation(rb, 2), modulation(rb, 1));
-            ccc_output(rb, 2) = CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb) + 11, 10*alpha_floor(rb, 2) + 1, modulation(rb, 1), modulation(rb, 2));
+            ccc_output(rb, 1) = CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, 10*fix(1-alpha_floor(rb, 1)) + 1, modulation(rb, 2), modulation(rb, 1));
+            ccc_output(rb, 2) = CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, 10*fix(1-alpha_floor(rb, 2)) + 1, modulation(rb, 1), modulation(rb, 2));
             
             % increment
             current_comb = current_comb + 1;
