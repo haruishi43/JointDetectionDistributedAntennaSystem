@@ -77,34 +77,51 @@ for drop = 1:num_drops
             end
         end 
         
-         
-        current_comb = 1;   % for incrementing
+        current_user = 1;   % for incrementing single user 
+        current_comb = 1;   % for incrementing combination
+        
         connection = 8 * ones(time_interval, num_rb, num_users);
         connection_jd = 8 * ones(time_interval, num_rb, num_users);
+        
+        ccc_output_one_user = zeros(time_interval, num_rb);
         ccc_output = zeros(time_interval, num_rb, num_select);
         ccc_output_jd = zeros(time_interval, num_rb, num_select);
+        ccc_output_ci = zeros(time_interval, num_rb, num_select);
+        ccc_output_ci_jd = zeros(time_interval, num_rb, num_select);
         
         for t = 1:time_interval
-            power_floor = zeros(num_rb, num_select);
-            alpha_floor = zeros(num_rb, num_select);
-            
             for rb = 1:num_rb
+              %% Max-C(/I) scheduling for 1 user
+                ccc_output_one_user(t, rb) = single_user_scheduling( current_user, all_signal_power(:, :, rb), ccc_table );
+                
               %% Round-Robin scheduling with Max-C  
-                %[ ccc_output(t, rb, :), ccc_output_jd(t, rb, :), power_floor(rb, :), alpha_floor(rb, :), connection(t, rb, :) ] = rr_max_c( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), ccc_table );
+                [ ccc_output(t, rb, :), ccc_output_jd(t, rb, :), ~, ~, ~ ] = rr_max_c( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), ccc_table );
                 
               %% Round-Robin schedulig with Max-C/I
-                [ ccc_output(t, rb, :), ccc_output_jd(t, rb, :), connection(t, rb, :), connection_jd(t, rb, :) ] = rr_max_ci( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), ccc_table );
+                [ ccc_output_ci(t, rb, :), ccc_output_ci_jd(t, rb, :), connection(t, rb, :), connection_jd(t, rb, :) ] = rr_max_ci( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), ccc_table );
                 
-                % increment
+              %% increment
                 current_comb = current_comb + 1;
                 if current_comb > tot_combinations
                     current_comb = 1;
                 end
+                
+                current_user = current_user + 1;
+                if current_user > num_users
+                    current_user = 1;
+                end
             end
         end
         toc
+        
+        
+        
+        % output for now:
+        sum(sum(ccc_output_one_user))
         sum(sum(sum(ccc_output)))
         sum(sum(sum(ccc_output_jd)))
+        sum(sum(sum(ccc_output_ci)))
+        sum(sum(sum(ccc_output_ci_jd)))
     end
     
 end
