@@ -17,17 +17,15 @@ num_sc = num_rb * num_sc_in_rb;     % # of total subcarriers
 band_per_rb = 180*10^3;             % frequency band range for each rb (Hz)
 band = band_per_rb * num_rb;        % total frequency band
 
-
-
 shadowing_ave = 0;
 shadowing_var = 8;
 rnd = -174;                         % Reciever Noise Density
 noise_power = 1;
-eirp = 0 + 30 - (rnd + 10*log10(band));
+eirp = 0 + 30 - ( rnd + 10*log10( band ) );
 
 % Scheduling parameters
 num_select = 2;                     % # of user selected for each combination
-[combination_table, tot_combinations] = create_combination_table(num_users, num_select);
+[combination_table, tot_combinations] = create_combination_table( num_users, num_select );
 
 %% Simulation parameters:
 num_drops = 1;
@@ -79,8 +77,7 @@ for drop = 1:num_drops
             end
         end 
         
-        %% Round-Robin scheduling with Max-C
-        
+        %% Round-Robin scheduling with Max-C   
         current_comb = 1;
         connection = 8 * ones(num_rb, num_users);
         
@@ -98,10 +95,10 @@ for drop = 1:num_drops
             % rr with max-c
             [ signal(rb, :, :), power(rb, :), connection(rb, :) ] = rr_max_c( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb) );
                
-            % calculate alpha and floor it
+            % calculate alpha and floor it (0 to 1 incremented by 0.1)
             [ alpha_floor(rb, :), alpha(rb, :) ] = calculate_alpha( squeeze( signal(rb, :, :) ) );
             
-            % floor P/N
+            % floor P/N (-10 to 30 incremented by 1)
             for i = 1:num_select
                 power_floor(rb, i) = floor(power(rb, i));
                 if power_floor(rb, i) >= 30
