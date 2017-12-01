@@ -1,5 +1,7 @@
 clear;
-load('CCCtable_2antenna');
+ccc_table = load('CCCtable_2antenna', ...
+                 'CCCtable_conv_SINRp_alphap_QAMq_QAMp', ...   % no joint ml detection
+                 'CCCtable_prop_SINRp_alphap_QAMq_QAMp');      % joint ml detection
 
 %% Randomize:
 rng('Shuffle');
@@ -52,6 +54,7 @@ for drop = 1:num_drops
     
     %% Simulation loop (trial):
     for trial = 1:trial_per_drop
+        tic
         
         %% Calculate Rayleigh Fading:
         channel_response_freq = add_rayleigh_fading( num_users, num_cell );
@@ -77,7 +80,7 @@ for drop = 1:num_drops
         end 
         
         %% Round-Robin scheduling with Max-C
-        tic
+        
         current_comb = 1;
         connection = 8 * ones(num_rb, num_users);
         
@@ -109,30 +112,15 @@ for drop = 1:num_drops
             end
             
             % find the best modulation
-            mod_list1 = squeeze(CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, round(10*(1-alpha_floor(rb, 1))) + 1, :, :));
-            mod_list2 = squeeze(CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, round(10*(1-alpha_floor(rb, 2))) + 1, :, :));
+            modulation(rb, :) = find_best_mod( power_floor(rb, :), alpha_floor(rb, :), 0, ccc_table );
+            modulation_jd(rb, :) = find_best_mod( power_floor(rb, :), alpha_floor(rb, :), 1, ccc_table );
             
-            tot_mod_list = mod_list1 + mod_list2';
-            [~, index] = max(tot_mod_list(:));
-            [row, col] = ind2sub(size(tot_mod_list), index);
+            % look up CCC output
+            ccc_output(rb, 1) = ccc_table.CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, round(10*(1-alpha_floor(rb, 1))) + 1, modulation(rb, 2), modulation(rb, 1));
+            ccc_output(rb, 2) = ccc_table.CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, round(10*(1-alpha_floor(rb, 2))) + 1, modulation(rb, 1), modulation(rb, 2));
             
-            modulation(rb, :) = [col, row];
-            
-            ccc_output(rb, 1) = CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, round(10*(1-alpha_floor(rb, 1))) + 1, modulation(rb, 2), modulation(rb, 1));
-            ccc_output(rb, 2) = CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, round(10*(1-alpha_floor(rb, 2))) + 1, modulation(rb, 1), modulation(rb, 2));
-            
-            % for jd
-            mod_list1 = squeeze(CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, round(10*(1-alpha_floor(rb, 1))) + 1, :, :));
-            mod_list2 = squeeze(CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, round(10*(1-alpha_floor(rb, 2))) + 1, :, :));
-            
-            tot_mod_list = mod_list1 + mod_list2';
-            [~, index] = max(tot_mod_list(:));
-            [row, col] = ind2sub(size(tot_mod_list), index);
-            
-            modulation_jd(rb, :) = [col, row];
-            
-            ccc_output_jd(rb, 1) = CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, round(10*(1-alpha_floor(rb, 1))) + 1, modulation_jd(rb, 2), modulation_jd(rb, 1));
-            ccc_output_jd(rb, 2) = CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, round(10*(1-alpha_floor(rb, 2))) + 1, modulation_jd(rb, 1), modulation_jd(rb, 2));
+            ccc_output_jd(rb, 1) = ccc_table.CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, round(10*(1-alpha_floor(rb, 1))) + 1, modulation_jd(rb, 2), modulation_jd(rb, 1));
+            ccc_output_jd(rb, 2) = ccc_table.CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, round(10*(1-alpha_floor(rb, 2))) + 1, modulation_jd(rb, 1), modulation_jd(rb, 2));
             
             % increment
             current_comb = current_comb + 1;
@@ -140,9 +128,8 @@ for drop = 1:num_drops
                 current_comb = 1;
             end
         end
-        
         toc
-
+        
     end
     
 end
