@@ -7,8 +7,9 @@ ccc_table = load('CCCtable_2antenna', ...
 rng('Shuffle');
 
 %% Model parameters:
-num_users = 3;                      % # of users
+num_users = 5;                      % # of users
 num_cell = 7;                       % # of cell
+preset_coordinates = [1 2 3 4 5];   % For Coordinate Testing (has to change when num_users change)
 
 num_rb = 24;                        % # of resource blocks in 1 OFDM symbol
 num_sc_in_rb = 12;                  % # of subcarriers in resource blocks
@@ -38,7 +39,6 @@ channel_response_freq = zeros(num_users, num_cell, num_sc);         % channel re
 channel_response = zeros(num_users, num_cell, num_rb);
 
 %% Create coordinates for each BS:
-preset_coordinates = [1 3 6]; % For Coordinate Testing (has to chnage when num_users change)
 antenna_coordinates = create_bs_coordinate();
 
 %% Simulation loop (change user placement):   
@@ -78,55 +78,58 @@ for drop = 1:num_drops
         end 
         
         %% Round-Robin scheduling with Max-C   
-        current_comb = 1;
-        connection = 8 * ones(num_rb, num_users);
+        current_comb = 1;   % for incrementing
+        connection = 8 * ones(time_interval, num_rb, num_users);
+        ccc_output = zeros(time_interval, num_rb, num_select);
+        ccc_output_jd = zeros(time_interval, num_rb, num_select);
         
-        signal = zeros(num_rb, num_select, num_select); % 1 is main signal, 2 is interference
-        power = zeros(num_rb, num_select);
-        alpha = zeros(num_rb, num_select);
-        power_floor = zeros(num_rb, num_select);
-        alpha_floor = zeros(num_rb, num_select);
-        modulation = zeros(num_rb, num_select);
-        modulation_jd = zeros(num_rb, num_select);
-        ccc_output = zeros(num_rb, num_select);
-        ccc_output_jd = zeros(num_rb, num_select);
-        
-        for rb = 1:num_rb
-            % rr with max-c
-            [ signal(rb, :, :), power(rb, :), connection(rb, :) ] = rr_max_c( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb) );
-               
-            % calculate alpha and floor it (0 to 1 incremented by 0.1)
-            [ alpha_floor(rb, :), alpha(rb, :) ] = calculate_alpha( squeeze( signal(rb, :, :) ) );
+        for t = 1:time_interval
+            signal = zeros(num_rb, num_select, num_select); % 1 is main signal, 2 is interference
+            power = zeros(num_rb, num_select);
+            alpha = zeros(num_rb, num_select);
+            power_floor = zeros(num_rb, num_select);
+            alpha_floor = zeros(num_rb, num_select);
+            modulation = zeros(num_rb, num_select);
+            modulation_jd = zeros(num_rb, num_select);
             
-            % floor P/N (-10 to 30 incremented by 1)
-            for i = 1:num_select
-                power_floor(rb, i) = floor(power(rb, i));
-                if power_floor(rb, i) >= 30
-                    power_floor(rb, i) = 30;
-                elseif power_floor(rb, i) <= -10
-                    power_floor(rb, i) = -10;
+            for rb = 1:num_rb
+                % rr with max-c
+                [ signal(rb, :, :), power(rb, :), connection(t, rb, :) ] = rr_max_c( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb) );
+
+                % calculate alpha and floor it (0 to 1 incremented by 0.1)
+                [ alpha_floor(rb, :), alpha(rb, :) ] = calculate_alpha( squeeze( signal(rb, :, :) ) );
+
+                % floor P/N (-10 to 30 incremented by 1)
+                for i = 1:num_select
+                    power_floor(rb, i) = floor(power(rb, i));
+                    if power_floor(rb, i) >= 30
+                        power_floor(rb, i) = 30;
+                    elseif power_floor(rb, i) <= -10
+                        power_floor(rb, i) = -10;
+                    end
                 end
-            end
-            
-            % find the best modulation
-            modulation(rb, :) = find_best_mod( power_floor(rb, :), alpha_floor(rb, :), 0, ccc_table );
-            modulation_jd(rb, :) = find_best_mod( power_floor(rb, :), alpha_floor(rb, :), 1, ccc_table );
-            
-            % look up CCC output
-            ccc_output(rb, 1) = ccc_table.CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, round(10*(1-alpha_floor(rb, 1))) + 1, modulation(rb, 2), modulation(rb, 1));
-            ccc_output(rb, 2) = ccc_table.CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, round(10*(1-alpha_floor(rb, 2))) + 1, modulation(rb, 1), modulation(rb, 2));
-            
-            ccc_output_jd(rb, 1) = ccc_table.CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, round(10*(1-alpha_floor(rb, 1))) + 1, modulation_jd(rb, 2), modulation_jd(rb, 1));
-            ccc_output_jd(rb, 2) = ccc_table.CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, round(10*(1-alpha_floor(rb, 2))) + 1, modulation_jd(rb, 1), modulation_jd(rb, 2));
-            
-            % increment
-            current_comb = current_comb + 1;
-            if current_comb > tot_combinations
-                current_comb = 1;
+
+                % find the best modulation
+                modulation(rb, :) = find_best_mod( power_floor(rb, :), alpha_floor(rb, :), 0, ccc_table );
+                modulation_jd(rb, :) = find_best_mod( power_floor(rb, :), alpha_floor(rb, :), 1, ccc_table );
+
+                % look up CCC output
+                ccc_output(t, rb, 1) = ccc_table.CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, round(10*(1-alpha_floor(rb, 1))) + 1, modulation(rb, 2), modulation(rb, 1));
+                ccc_output(t, rb, 2) = ccc_table.CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, round(10*(1-alpha_floor(rb, 2))) + 1, modulation(rb, 1), modulation(rb, 2));
+
+                ccc_output_jd(t, rb, 1) = ccc_table.CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 1) + 11, round(10*(1-alpha_floor(rb, 1))) + 1, modulation_jd(rb, 2), modulation_jd(rb, 1));
+                ccc_output_jd(t, rb, 2) = ccc_table.CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(rb, 2) + 11, round(10*(1-alpha_floor(rb, 2))) + 1, modulation_jd(rb, 1), modulation_jd(rb, 2));
+
+                % increment
+                current_comb = current_comb + 1;
+                if current_comb > tot_combinations
+                    current_comb = 1;
+                end
             end
         end
         toc
-        
+        sum(sum(sum(ccc_output)))
+        sum(sum(sum(ccc_output_jd)))
     end
     
 end
