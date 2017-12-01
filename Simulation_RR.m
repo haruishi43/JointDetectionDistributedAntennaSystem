@@ -9,7 +9,7 @@ rng('Shuffle');
 %% Model parameters:
 num_users = 3;                      % # of users
 num_cell = 7;                       % # of cell
-preset_coordinates = [1 2 3];   % For Coordinate Testing (has to change when num_users change)
+preset_coordinates = [2 4 6];   % For Coordinate Testing (has to change when num_users change)
 
 num_rb = 24;                        % # of resource blocks in 1 OFDM symbol
 num_sc_in_rb = 12;                  % # of subcarriers in resource blocks

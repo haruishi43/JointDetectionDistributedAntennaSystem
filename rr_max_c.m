@@ -40,7 +40,7 @@ current_signal_u2 = current_signal(u2, :);
 
 % if user 2 tries to connect to user 1's DA, it would not let it happen
 if isempty( find( i == connection(1, :), 1 ) ) == 1
-    connection(1, 2) = i;
+    connection(1, u2) = i;
     
     signal(2, 1) = s;
     signal(1, 2) = current_signal(u1, i);
