@@ -63,8 +63,8 @@ for i = 1:2
 end
 
 %% Find the best modulation
-modulation = find_best_mod( power_floor, alpha_floor, 0, ccc_table );
-modulation_jd = find_best_mod( power_floor, alpha_floor, 1, ccc_table );
+[modulation, ~] = find_best_mod( power_floor, alpha_floor, 0, ccc_table );
+[modulation_jd, ~] = find_best_mod( power_floor, alpha_floor, 1, ccc_table );
 
 % look up CCC output
 ccc_output(1, 1) = ccc_table.CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(1) + 11, round(10*(1-alpha_floor(1))) + 1, modulation(2), modulation(1));

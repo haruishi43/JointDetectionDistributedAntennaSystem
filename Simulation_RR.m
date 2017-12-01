@@ -7,9 +7,9 @@ ccc_table = load('CCCtable_2antenna', ...
 rng('Shuffle');
 
 %% Model parameters:
-num_users = 3;                      % # of users
+num_users = 5;                      % # of users
 num_cell = 7;                       % # of cell
-preset_coordinates = [2 4 6];   % For Coordinate Testing (has to change when num_users change)
+preset_coordinates = [1 2 1 7 1];   % For Coordinate Testing (has to change when num_users change)
 
 num_rb = 24;                        % # of resource blocks in 1 OFDM symbol
 num_sc_in_rb = 12;                  % # of subcarriers in resource blocks
@@ -30,7 +30,7 @@ num_select = 2;                     % # of user selected for each combination
 
 %% Simulation parameters:
 num_drops = 1;
-time_interval = 1;
+time_interval = 10;
 trial_per_drop = 1;
 
 %% Initializing variables:
@@ -80,6 +80,7 @@ for drop = 1:num_drops
          
         current_comb = 1;   % for incrementing
         connection = 8 * ones(time_interval, num_rb, num_users);
+        connection_jd = 8 * ones(time_interval, num_rb, num_users);
         ccc_output = zeros(time_interval, num_rb, num_select);
         ccc_output_jd = zeros(time_interval, num_rb, num_select);
         
@@ -89,10 +90,10 @@ for drop = 1:num_drops
             
             for rb = 1:num_rb
               %% Round-Robin scheduling with Max-C  
-                [ ccc_output(t, rb, :), ccc_output_jd(t, rb, :), power_floor(rb, :), alpha_floor(rb, :), connection(t, rb, :) ] = rr_max_c( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), ccc_table );
+                %[ ccc_output(t, rb, :), ccc_output_jd(t, rb, :), power_floor(rb, :), alpha_floor(rb, :), connection(t, rb, :) ] = rr_max_c( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), ccc_table );
                 
               %% Round-Robin schedulig with Max-C/I
-                
+                [ ccc_output(t, rb, :), ccc_output_jd(t, rb, :), connection(t, rb, :), connection_jd(t, rb, :) ] = rr_max_ci( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), ccc_table );
                 
                 % increment
                 current_comb = current_comb + 1;
