@@ -1,11 +1,17 @@
-function [ signal, power, connection ] = rr_max_c( num_users, combination, current_signal )
+function [ ccc_output, ccc_output_jd, power_floor, alpha_floor, connection ] = rr_max_c( num_users, combination, current_signal, ccc_table )
 % RR user scheduling with Max-C (not Max-C/I) scheduling for DA selection
 % 2 users are seleted in this RR scheduling
 %
-% returns signal (pair of mai signal and interference), 
-% cumulative power (S + I), and connections
+% returns power (floored) and alpha (floored)
 %
 
+
+
+%% Outputs
+ccc_output = zeros(1, 2);
+ccc_output_jd = zeros(1, 2);
+
+%% RR and Max-C
 % user 1 is always prioritized than user 2
 u1 = combination(1);
 u2 = combination(2);
@@ -42,6 +48,30 @@ if isempty( find( i == connection(1, :), 1 ) ) == 1
     power(1, 2) = power(1, 2) + 10*log10( abs(s) );
     power(1, 1) = power(1, 1) + 10*log10( abs(signal(1, 2)) );
 end
+
+%% Calculate alpha and floor power and alpha
+[ alpha_floor, ~ ] = calculate_alpha( signal(:,:) ); % (0 to 1 incremented by 0.1)
+power_floor = zeros(1, 2);  % (-10 to 30 incremented by 1)
+
+for i = 1:2
+    power_floor(i) = floor(power(i));
+    if power_floor(i) >= 30
+        power_floor(i) = 30;
+    elseif power_floor(i) <= -10
+        power_floor(i) = -10;
+    end
+end
+
+%% Find the best modulation
+modulation = find_best_mod( power_floor, alpha_floor, 0, ccc_table );
+modulation_jd = find_best_mod( power_floor, alpha_floor, 1, ccc_table );
+
+% look up CCC output
+ccc_output(1, 1) = ccc_table.CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(1) + 11, round(10*(1-alpha_floor(1))) + 1, modulation(2), modulation(1));
+ccc_output(1, 2) = ccc_table.CCCtable_conv_SINRp_alphap_QAMq_QAMp( power_floor(2) + 11, round(10*(1-alpha_floor(2))) + 1, modulation(1), modulation(2));
+
+ccc_output_jd(1, 1) = ccc_table.CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(1) + 11, round(10*(1-alpha_floor(1))) + 1, modulation_jd(2), modulation_jd(1));
+ccc_output_jd(1, 2) = ccc_table.CCCtable_prop_SINRp_alphap_QAMq_QAMp( power_floor(2) + 11, round(10*(1-alpha_floor(2))) + 1, modulation_jd(1), modulation_jd(2));
 
 end
 
