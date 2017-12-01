@@ -75,7 +75,7 @@ for drop = 1:num_drops
 
                 end
             end
-        end 
+        end
         
         current_user = 1;   % for incrementing single user 
         current_comb = 1;   % for incrementing combination
@@ -91,7 +91,7 @@ for drop = 1:num_drops
         
         for t = 1:time_interval
             for rb = 1:num_rb
-              %% Max-C(/I) scheduling for 1 user
+              %% Max-C(/I) scheduling for single user
                 ccc_output_one_user(t, rb) = single_user_scheduling( current_user, all_signal_power(:, :, rb), ccc_table );
                 
               %% Round-Robin scheduling with Max-C  
@@ -113,8 +113,6 @@ for drop = 1:num_drops
             end
         end
         toc
-        
-        
         
         % output for now:
         sum(sum(ccc_output_one_user))
