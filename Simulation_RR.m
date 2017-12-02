@@ -85,7 +85,7 @@ for drop = 1:num_drops
                 end
             end
             
-            for macro = 1:num_macro
+            for macro = 1:num_outer_macro
                 
                 for cell = 1:num_cell
                     const = 10.^(( eirp  - plr_from_outer_cell(drop, macro, user, cell) ) / 10);
