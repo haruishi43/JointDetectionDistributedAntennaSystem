@@ -79,8 +79,22 @@ for drop = 1:num_drops
 
                     % signal in real number domain
                     all_signal_power(user, cell, rb) = sqrt(shadowing_var)*10^( randn(1,1) ) * const * ( abs( channel_response(user, cell, rb) ).^2 );
-
+                    
+                    
+                    
                 end
+            end
+            
+            for macro = 1:num_macro
+                
+                for cell = 1:num_cell
+                    const = 10.^(( eirp  - plr_from_outer_cell(drop, macro, user, cell) ) / 10);
+                    
+                    % what am I supposed to do here?
+                    
+                end
+                
+                
             end
         end
         
