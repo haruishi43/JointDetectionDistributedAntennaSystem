@@ -9,7 +9,8 @@ rng('Shuffle');
 %% Model parameters:
 num_users = 5;                      % # of users
 num_cell = 7;                       % # of cell
-preset_coordinates = [1 2 1 7 1];   % For Coordinate Testing (has to change when num_users change)
+num_outer_macro = 6;
+preset_coordinates = [2 2 2 2 7];   % For Coordinate Testing (has to change when num_users change)
 
 num_rb = 24;                        % # of resource blocks in 1 OFDM symbol
 num_sc_in_rb = 12;                  % # of subcarriers in resource blocks
@@ -34,12 +35,17 @@ time_interval = 10;
 trial_per_drop = 1;
 
 %% Initializing variables:
-plr_from_bs_all = zeros(num_drops,num_cell,num_users);              % packet loss ratio 
-channel_response_freq = zeros(num_users, num_cell, num_sc);         % channel response frequency
+plr_from_bs_all = zeros(num_drops, num_users, num_cell);              % propagation loss ratio
+plr_from_outer_cell = zeros(num_drops, num_outer_macro, num_users, num_cell);          % propagation loss ratio from outer cell
+
+channel_response_freq = zeros(num_users, num_cell, num_sc);           % channel response frequency
 channel_response = zeros(num_users, num_cell, num_rb);
 
 %% Create coordinates for each BS:
 antenna_coordinates = create_bs_coordinate();
+
+%% Create outer cell coordinates:
+outer_cell_coordinates = create_outer_cell_coordinates();
 
 %% Simulation loop (change user placement):   
 for drop = 1:num_drops
@@ -49,6 +55,7 @@ for drop = 1:num_drops
     
     %% Calculate Propagation Loss 
     plr_from_bs_all(drop, :, :) = create_plr_from_bs( antenna_coordinates, user_coordinates );
+    plr_from_outer_cell(drop, :, :, :) = create_plr_from_outer_cell( outer_cell_coordinates, user_coordinates );
     
     %% Simulation loop (trial):
     for trial = 1:trial_per_drop
@@ -62,7 +69,7 @@ for drop = 1:num_drops
         for user = 1:num_users
             for cell = 1:num_cell
                 
-                const = 10.^(( eirp  - plr_from_bs_all(drop, cell, user) ) / 10);
+                const = 10.^(( eirp  - plr_from_bs_all(drop, user, cell) ) / 10);
                 
                 for rb = 1:num_rb
                     
