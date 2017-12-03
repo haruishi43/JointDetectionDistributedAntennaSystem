@@ -41,6 +41,13 @@ plr_from_outer_cell = zeros(num_drops, num_outer_macro, num_users, num_cell);   
 channel_response_freq = zeros(num_users, num_cell, num_sc);           % channel response frequency
 channel_response = zeros(num_users, num_cell, num_rb);
 
+%% Saving variables:
+throughput_one_user = zeros(num_drops, trial_per_drop, time_interval, num_rb);
+throughput = zeros(num_drops, trial_per_drop, time_interval, num_rb, num_select);
+throughput_jd = zeros(num_drops, trial_per_drop, time_interval, num_rb, num_select);
+throughput_ci = zeros(num_drops, trial_per_drop, time_interval, num_rb, num_select);
+throughput_ci_jd = zeros(num_drops, trial_per_drop, time_interval, num_rb, num_select);
+
 %% Create coordinates for each BS:
 antenna_coordinates = create_bs_coordinate();
 
@@ -80,8 +87,6 @@ for drop = 1:num_drops
                     % signal in real number domain
                     all_signal_power(user, cell, rb) = sqrt(shadowing_var)*10^( randn(1,1) ) * const * ( abs( channel_response(user, cell, rb) ).^2 );
                     
-                    
-                    
                 end
             end
             
@@ -91,6 +96,7 @@ for drop = 1:num_drops
                     const = 10.^(( eirp  - plr_from_outer_cell(drop, macro, user, cell) ) / 10);
                     
                     % what am I supposed to do here?
+                    
                     
                 end
                 
@@ -135,12 +141,19 @@ for drop = 1:num_drops
         end
         toc
         
-        % output for now:
-        sum(sum(ccc_output_one_user))
-        sum(sum(sum(ccc_output)))
-        sum(sum(sum(ccc_output_jd)))
-        sum(sum(sum(ccc_output_ci)))
-        sum(sum(sum(ccc_output_ci_jd)))
+        throughput_one_user(drop, trial, :, :) = ccc_output_one_user;
+        throughput(drop, trial, :, :, :) = ccc_output;
+        throughput_jd(drop, trial, :, :, :) = ccc_output_jd;
+        throughput_ci(drop, trial, :, :, :) = ccc_output_ci;
+        throughput_ci_jd(drop, trial, :, :, :) = ccc_output_ci_jd;
+        
     end
     
 end
+
+% output for now:
+sum(sum(sum(sum(throughput_one_user))))
+sum(sum(sum(sum(sum(throughput)))))
+sum(sum(sum(sum(sum(throughput_jd)))))
+sum(sum(sum(sum(sum(throughput_ci)))))
+sum(sum(sum(sum(sum(throughput_ci_jd)))))
