@@ -7,7 +7,7 @@ function coordinates = create_user_coordinates( antenna_coordinates, optional_nu
 %   Optional:
 %       1. Presets for User Placement  (default: placed randomly)
 %       2. Number of Users             (default: 3)
-%       3. Inter-site Distance         (default: 500m)
+%       3. Inter-site Distance         (default: 500m -> 189m)
 %   
 %   Outputs:
 %       Coordinates for Each User
@@ -29,11 +29,11 @@ switch nargin
     case 1
         % default case:
         num_users = 3;
-        is_distance = 500;
+        is_distance = 189;
         user_placement = randi(7, num_users, 1);
     case 2
         num_users = optional_num_users;
-        is_distance = 500;
+        is_distance = 189;
         user_placement = randi(7, num_users, 1);
     case 3
         num_users = optional_num_users;

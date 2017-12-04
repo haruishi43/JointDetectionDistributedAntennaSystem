@@ -6,13 +6,13 @@ function coordinates = create_bs_coordinate( optional_intersite_distance )
 %   The number of cell is 7.
 %
 %   Default values:
-%     Inter-site Distance: 500
+%     Inter-site Distance: 500 -> 189
 %
 
 if nargin > 0
     intersite_distance = optional_intersite_distance;
 else
-    intersite_distance = 500;
+    intersite_distance = 189;
 end
 
 no_cell = 7; 

@@ -1,7 +1,7 @@
 function coordinates = create_outer_cell_coordinates(  )
 % Create outer macro cell coordinates 
 
-is_d = 500;     % inter-site distance (500m)
+is_d = 189;     % inter-site distance (500m -> 189m)
 
 coordinates = zeros(6, 7);  
 r = (is_d/2) / cos( pi/6 );    % cell radius

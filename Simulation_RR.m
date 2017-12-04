@@ -58,7 +58,7 @@ outer_cell_coordinates = create_outer_cell_coordinates();
 for drop = 1:num_drops
     
     %% Create Coordinates for each user:
-    user_coordinates = create_user_coordinates( antenna_coordinates, num_users, 500, preset_coordinates );
+    user_coordinates = create_user_coordinates( antenna_coordinates, num_users, 189, preset_coordinates );
     
     %% Calculate Propagation Loss 
     plr_from_bs_all(drop, :, :) = create_plr_from_bs( antenna_coordinates, user_coordinates );
@@ -73,7 +73,6 @@ for drop = 1:num_drops
         
         %% Average to create channel response for each RB:
         all_signal_power = zeros(num_users, num_cell, num_rb);
-        all_signal_power_outer = zeros(num_outer_macro, num_users, num_cell, num_rb);
         for user = 1:num_users
             for cell = 1:num_cell
                 
@@ -83,31 +82,42 @@ for drop = 1:num_drops
                     
                     % channel response (average of all subcarriers in a
                     % resource block
+                    % dB 
                     channel_response(user, cell, rb) = mean( channel_response_freq( user, cell, num_sc_in_rb * (rb-1) + 1:num_sc_in_rb * rb ) );
-
+                    %channel_response(user, cell, rb) = mean( abs( channel_response_freq( user, cell, num_sc_in_rb * (rb-1) + 1:num_sc_in_rb * rb ) ).^2 );
+                    
                     % signal in real number domain
-                    all_signal_power(user, cell, rb) = sqrt(shadowing_var)*10^( randn(1,1) ) * const * ( abs( channel_response(user, cell, rb) ).^2 );
+                    all_signal_power(user, cell, rb) = 10^( sqrt(shadowing_var)*randn(1,1) / 10 ) * const * ( abs( channel_response(user, cell, rb) ).^2 );
                     
                 end
-            end
-            
-            for macro = 1:num_outer_macro
-                
-                for cell = 1:num_cell
-                    const = 10.^(( eirp  - plr_from_outer_cell(drop, macro, user, cell) ) / 10);
-                    
-                    % what am I supposed to do here?
-                    for rb = 1:num_rb
-
-                        % signal in real number domain
-                        all_signal_power_outer(macro, user, cell, rb) = sqrt(shadowing_var)*10^( randn(1,1) ) * const * ( abs( channel_response(user, cell, rb) ).^2 );
-
-                    end
-                    
-                end
-
             end
         end
+        
+        %% Signal power from outer cell:
+        all_signal_power_outer = zeros(num_outer_macro, num_users, num_cell, num_rb);
+        for macro = 1:num_outer_macro
+            channel_response_macro = zeros(num_users, num_cell, num_rb);
+            channel_response_macro_freq = add_rayleigh_fading( num_users, num_cell );
+            
+            for user = 1:num_users
+                for cell = 1:num_cell
+                    
+                    const = 10.^(( eirp  - plr_from_outer_cell(drop, macro, user, cell) ) / 10);
+
+                    % what am I supposed to do here?
+                    for rb = 1:num_rb
+                        
+                        channel_response_macro(user, cell, rb) = mean( channel_response_macro_freq( user, cell, num_sc_in_rb * (rb-1) + 1:num_sc_in_rb * rb ) );
+                        % signal in real number domain
+                        all_signal_power_outer(macro, user, cell, rb) = 10^( sqrt(shadowing_var)*randn(1,1) / 10 ) * const * ( abs( channel_response_macro(user, cell, rb) ).^2 );
+
+                    end
+                end
+            end
+        end
+        
+        
+        %% 
         
         current_user = 1;   % for incrementing single user 
         current_comb = 1;   % for incrementing combination
