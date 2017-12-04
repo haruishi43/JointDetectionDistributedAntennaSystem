@@ -5,8 +5,6 @@ function [ ccc_output, ccc_output_jd, power_floor, alpha_floor, connection ] = r
 % returns power (floored) and alpha (floored)
 %
 
-
-
 %% Outputs
 ccc_output = zeros(1, 2);
 ccc_output_jd = zeros(1, 2);

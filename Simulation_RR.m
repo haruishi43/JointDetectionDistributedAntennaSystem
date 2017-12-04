@@ -69,7 +69,7 @@ for drop = 1:num_drops
         tic
         
         %% Calculate Rayleigh Fading:
-        channel_response_freq = add_rayleigh_fading( num_users, num_cell );
+        channel_response_freq = add_rician_fading( num_users, num_cell );
         
         %% Average to create channel response for each RB:
         all_signal_power = zeros(num_users, num_cell, num_rb);
@@ -103,8 +103,7 @@ for drop = 1:num_drops
                 for cell = 1:num_cell
                     
                     const = 10.^(( eirp  - plr_from_outer_cell(drop, macro, user, cell) ) / 10);
-
-                    % what am I supposed to do here?
+                    
                     for rb = 1:num_rb
                         
                         channel_response_macro(user, cell, rb) = mean( channel_response_macro_freq( user, cell, num_sc_in_rb * (rb-1) + 1:num_sc_in_rb * rb ) );

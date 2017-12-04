@@ -39,7 +39,7 @@ channel_response_freq = zeros(num_user, num_cell, num_sc);
 for user = 1:num_user
     for cell = 1:num_cell
         % 1 ~ # of paths:
-        channel_response_time(user, cell, 1:num_paths) = ( 1/sqrt(2).*( randn(num_paths, 1) + 1i*randn(num_paths, 1) ) ) .* sqrt(delay_profile);
+        channel_response_time(user, cell, 1:num_paths) = (1/sqrt(2).*( randn(num_paths, 1) + 1i*randn(num_paths, 1) )).*sqrt(delay_profile);
         % # of paths +1 ~ # of subcarriers:
         channel_response_time(user, cell, (num_paths+1):num_sc) = zeros( 1, 1, (num_sc - num_paths) );
         
@@ -48,4 +48,3 @@ for user = 1:num_user
     end
 end
 end
-
