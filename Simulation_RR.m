@@ -73,6 +73,7 @@ for drop = 1:num_drops
         
         %% Average to create channel response for each RB:
         all_signal_power = zeros(num_users, num_cell, num_rb);
+        all_signal_power_outer = zeros(num_outer_macro, num_users, num_cell, num_rb);
         for user = 1:num_users
             for cell = 1:num_cell
                 
@@ -96,11 +97,15 @@ for drop = 1:num_drops
                     const = 10.^(( eirp  - plr_from_outer_cell(drop, macro, user, cell) ) / 10);
                     
                     % what am I supposed to do here?
-                    
+                    for rb = 1:num_rb
+
+                        % signal in real number domain
+                        all_signal_power_outer(macro, user, cell, rb) = sqrt(shadowing_var)*10^( randn(1,1) ) * const * ( abs( channel_response(user, cell, rb) ).^2 );
+
+                    end
                     
                 end
-                
-                
+
             end
         end
         
