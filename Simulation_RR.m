@@ -10,7 +10,7 @@ rng('Shuffle');
 num_users = 5;                      % # of users
 num_cell = 7;                       % # of cell
 num_outer_macro = 6;
-preset_coordinates = [2 2 2 2 7];   % For Coordinate Testing (has to change when num_users change)
+preset_coordinates = [1 3 5 6 7];   % For Coordinate Testing (has to change when num_users change)
 
 num_rb = 24;                        % # of resource blocks in 1 OFDM symbol
 num_sc_in_rb = 12;                  % # of subcarriers in resource blocks
@@ -109,7 +109,7 @@ for drop = 1:num_drops
                         
                         channel_response_macro(user, cell, rb) = mean( channel_response_macro_freq( user, cell, num_sc_in_rb * (rb-1) + 1:num_sc_in_rb * rb ) );
                         % signal in real number domain
-                        all_signal_power_outer(macro, user, cell, rb) = 10^( sqrt(shadowing_var)*randn(1,1) / 10 ) * const * ( abs( channel_response_macro(user, cell, rb) ).^2 );
+                        all_signal_power_outer(macro, user, cell, rb) = const * ( abs( channel_response_macro(user, cell, rb) ).^2 );
 
                     end
                 end
