@@ -1,4 +1,4 @@
-function [ ccc_output, ccc_output_jd, power_floor, alpha_floor, connection ] = rr_max_c( num_users, combination, current_signal, ccc_table )
+function [ ccc_output, ccc_output_jd, power_floor, alpha_floor, connection ] = rr_max_c( num_users, combination, current_signal, all_signal_power_outer, noise, ccc_table )
 % RR user scheduling with Max-C (not Max-C/I) scheduling for DA selection
 % 2 users are seleted in this RR scheduling
 %
@@ -20,7 +20,7 @@ connection = 8 * ones(1, num_users);
 signal = zeros(2, 2); % 1 is main signal, 2 is interference
 % [1, 1] is user 1's main signal, [1, 2] is user 1's interference
 % [2, 1] is user 2's main signal, [2, 2] is user 2's interference
-power = zeros(1, 2);
+power_real = zeros(1, 2);
 
 % max-c (best signal power is chosen)
 current_signal_u1 = current_signal(u1, : );
@@ -31,8 +31,8 @@ signal(1, 1) = s;
 signal(2, 2) = current_signal(u2, i);
 
 % power (in dB)
-power(1, 1) = 10*log10( abs(s) );
-power(1, 2) = 10*log10( abs(signal(2, 2)) );
+power_real(1, 1) = s;
+power_real(1, 2) = signal(2, 2);
 
 % max-c for user 2
 current_signal_u2 = current_signal(u2, :);
@@ -45,16 +45,29 @@ if isempty( find( i == connection(1, :), 1 ) ) == 1
     signal(2, 1) = s;
     signal(1, 2) = current_signal(u1, i);
     
-    power(1, 2) = power(1, 2) + 10*log10( abs(s) );
-    power(1, 1) = power(1, 1) + 10*log10( abs(signal(1, 2)) );
+    power_real(1, 2) = power_real(1, 2) + s;
+    power_real(1, 1) = power_real(1, 1) + signal(1, 2);
 end
+
 
 %% Calculate alpha and floor power and alpha
 [ alpha_floor, ~ ] = calculate_alpha( signal(:,:) ); % (0 to 1 incremented by 0.1)
 power_floor = zeros(1, 2);  % (-10 to 30 incremented by 1)
 
 for i = 1:2
-    power_floor(i) = floor(power(i));
+    % calculate outer cell
+    power_macro = 0;
+    for macro = 1:numel( all_signal_power_outer(:, 1, 1) )
+        % choose randomly 2 out of 7 cells
+        a = randi([1 7]);
+        b = randi([1 7]);
+        while a~=b
+            b = randi([1 7]);
+        end
+        power_macro = power_macro + all_signal_power_outer(macro, combination(i), a) + all_signal_power_outer(macro,  combination(i), b);
+    end
+    
+    power_floor(i) = floor( 10*log10( power_real(i) / ( 10^( noise / 10 ) + power_macro) ) );
     if power_floor(i) >= 30
         power_floor(i) = 30;
     elseif power_floor(i) <= -10

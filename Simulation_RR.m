@@ -7,7 +7,7 @@ ccc_table = load('CCCtable_2antenna', ...
 rng('Shuffle');
 
 %% Model parameters:
-num_users = 5;                      % # of users
+num_users = 10;                      % # of users
 num_cell = 7;                       % # of cell
 num_outer_macro = 6;
 preset_coordinates = [1 3 5 6 7];   % For Coordinate Testing (has to change when num_users change)
@@ -22,8 +22,8 @@ band = band_per_rb * num_rb;        % total frequency band
 shadowing_ave = 0;
 shadowing_var = 8;
 rnd = -174;                         % Reciever Noise Density
-noise_power = 1;
-eirp = 0 + 30 - ( rnd + 10*log10( band ) );
+noise_power = rnd + 10*log10( band );
+eirp = 0 + 30;
 
 % Scheduling parameters
 num_select = 2;                     % # of user selected for each combination
@@ -58,7 +58,7 @@ outer_cell_coordinates = create_outer_cell_coordinates();
 for drop = 1:num_drops
     
     %% Create Coordinates for each user:
-    user_coordinates = create_user_coordinates( antenna_coordinates, num_users, 189, preset_coordinates );
+    user_coordinates = create_user_coordinates( antenna_coordinates, num_users );
     
     %% Calculate Propagation Loss 
     plr_from_bs_all(drop, :, :) = create_plr_from_bs( antenna_coordinates, user_coordinates );
@@ -81,9 +81,9 @@ for drop = 1:num_drops
                 for rb = 1:num_rb
                     
                     % channel response (average of all subcarriers in a
-                    % resource block
-                    % dB 
+                    % resource block) 
                     channel_response(user, cell, rb) = mean( channel_response_freq( user, cell, num_sc_in_rb * (rb-1) + 1:num_sc_in_rb * rb ) );
+                    % this might be better:
                     %channel_response(user, cell, rb) = mean( abs( channel_response_freq( user, cell, num_sc_in_rb * (rb-1) + 1:num_sc_in_rb * rb ) ).^2 );
                     
                     % signal in real number domain
@@ -117,10 +117,9 @@ for drop = 1:num_drops
         end
         
         
-        %% 
-        
-        current_user = 1;   % for incrementing single user 
-        current_comb = 1;   % for incrementing combination
+        %% Scheduling:
+        current_user = 1;   % for incrementing single user (start from user 1)
+        current_comb = 1;   % for incrementing combination 
         
         connection = 8 * ones(time_interval, num_rb, num_users);
         connection_jd = 8 * ones(time_interval, num_rb, num_users);
@@ -134,13 +133,13 @@ for drop = 1:num_drops
         for t = 1:time_interval
             for rb = 1:num_rb
               %% Max-C(/I) scheduling for single user
-                ccc_output_one_user(t, rb) = single_user_scheduling( current_user, all_signal_power(:, :, rb), ccc_table );
+                ccc_output_one_user(t, rb) = single_user_scheduling( current_user, all_signal_power(:, :, rb), all_signal_power_outer(:, :, :, rb), noise_power, ccc_table );
                 
               %% Round-Robin scheduling with Max-C  
-                [ ccc_output(t, rb, :), ccc_output_jd(t, rb, :), ~, ~, ~ ] = rr_max_c( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), ccc_table );
+                [ ccc_output(t, rb, :), ccc_output_jd(t, rb, :), ~, ~, ~ ] = rr_max_c( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), all_signal_power_outer(:, :, :, rb), noise_power, ccc_table );
                 
               %% Round-Robin schedulig with Max-C/I
-                [ ccc_output_ci(t, rb, :), ccc_output_ci_jd(t, rb, :), connection(t, rb, :), connection_jd(t, rb, :) ] = rr_max_ci( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), ccc_table );
+                [ ccc_output_ci(t, rb, :), ccc_output_ci_jd(t, rb, :), connection(t, rb, :), connection_jd(t, rb, :) ] = rr_max_ci( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), all_signal_power_outer(:, :, :, rb), noise_power, ccc_table );
                 
               %% increment
                 current_comb = current_comb + 1;
@@ -167,8 +166,8 @@ for drop = 1:num_drops
 end
 
 % output for now:
-sum(sum(sum(sum(throughput_one_user))))
-sum(sum(sum(sum(sum(throughput)))))
-sum(sum(sum(sum(sum(throughput_jd)))))
-sum(sum(sum(sum(sum(throughput_ci)))))
-sum(sum(sum(sum(sum(throughput_ci_jd)))))
+sum(sum(sum(sum(throughput_one_user)))) / num_drops / trial_per_drop
+sum(sum(sum(sum(sum(throughput))))) / num_drops / trial_per_drop
+sum(sum(sum(sum(sum(throughput_jd))))) / num_drops / trial_per_drop
+sum(sum(sum(sum(sum(throughput_ci))))) / num_drops / trial_per_drop
+sum(sum(sum(sum(sum(throughput_ci_jd))))) / num_drops / trial_per_drop

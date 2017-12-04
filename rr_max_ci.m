@@ -1,4 +1,4 @@
-function [ ccc_output, ccc_output_jd, connection, connection_jd ] = rr_max_ci( num_users, combination, current_signal, ccc_table )
+function [ ccc_output, ccc_output_jd, connection, connection_jd ] = rr_max_ci( num_users, combination, current_signal, all_signal_power_outer, noise, ccc_table )
 % Round-Robin scheduling with Max-C/I scheduling 
 
 % update best throughput modulation
@@ -36,8 +36,8 @@ for cell_u1 = 1:7
     signal(1, 1) = current_signal_u1(cell_u1);
     signal(2, 2) = current_signal_u2(cell_u1);
     
-    power(1, 1) = 10*log10( abs(signal(1, 1)) );
-    power(1, 2) = 10*log10( abs(signal(2, 2)) );
+    power(1, 1) = signal(1, 1);
+    power(1, 2) = signal(2, 2);
     
     for cell_u2  = 1:7
         if cell_u2 ~= cell_u1
@@ -45,8 +45,8 @@ for cell_u1 = 1:7
             signal(2, 1) = current_signal_u2(cell_u2);
             signal(1, 2) = current_signal_u1(cell_u2);
             
-            power(1, 2) = power(1, 2) + 10*log10( abs(signal(2, 1)) );
-            power(1, 1) = power(1, 1) + 10*log10( abs(signal(1, 2)) );
+            power(1, 2) = power(1, 2) + signal(2, 1);
+            power(1, 1) = power(1, 1) + signal(1, 2);
             
             cell_u2_new = cell_u2;
         else
@@ -58,7 +58,20 @@ for cell_u1 = 1:7
         power_floor = zeros(1, 2);  % (-10 to 30 incremented by 1)
         
         for i = 1:2
-            power_floor(i) = floor(power(i));
+            
+            % calculate outer cell
+            power_macro = 0;
+            for macro = 1:numel( all_signal_power_outer(:, 1, 1) )
+                % choose randomly 2 out of 7 cells
+                a = randi([1 7]);
+                b = randi([1 7]);
+                while a~=b
+                    b = randi([1 7]);
+                end
+                power_macro = power_macro + all_signal_power_outer(macro, combination(i), a) + all_signal_power_outer(macro,  combination(i), b);
+            end
+            
+            power_floor(i) = floor( 10*log10( power(i) / ( 10^( noise / 10 ) + power_macro) ) );
             if power_floor(i) >= 30
                 power_floor(i) = 30;
             elseif power_floor(i) <= -10
