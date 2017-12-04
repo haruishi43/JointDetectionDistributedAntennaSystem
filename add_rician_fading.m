@@ -26,7 +26,7 @@ num_sc = num_rb * num_sc_in_rb;     % # of total subcarriers
 num_paths = 1;                      % # of paths based on Jake's model
 rms_delay_spread = 1.0 * 10^(-6);   % root mean square of delay spread
 interval = 1 / band;                % sampling interval for Jake's model
-k = 0.9;                            % k factor
+k = 10;                            % k factor
 
 %% Calculate Delay:
 delay_profile = zeros(num_paths, 1);
