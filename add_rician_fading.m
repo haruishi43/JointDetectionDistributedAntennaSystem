@@ -2,6 +2,10 @@ function channel_response_freq = add_rician_fading( num_user, num_cell, opt_num_
 % Rician Fading:
 % FIXME: add desciptions
 
+% Rician Fading:
+% k factor is used
+% 
+
 %% Randomize:
 rng('shuffle');
 
@@ -23,9 +27,6 @@ num_paths = 1;                      % # of paths based on Jake's model
 rms_delay_spread = 1.0 * 10^(-6);   % root mean square of delay spread
 interval = 1 / band;                % sampling interval for Jake's model
 k = 0.9;                            % k factor
-
-% FIXME: using?
-%pow_amp = [10^(-0.30) 10^(-0.00) 10^(-0.20) 10^(-0.6) 10^(-0.8) 10^(-1.0)];
 
 %% Calculate Delay:
 delay_profile = zeros(num_paths, 1);

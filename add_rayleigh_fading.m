@@ -23,7 +23,6 @@ num_paths = 6;                      % # of paths based on Jake's model
 rms_delay_spread = 1.0 * 10^(-6);   % root mean square of delay spread
 interval = 1 / band;                % sampling interval for Jake's model
 
-% FIXME: using?
 %pow_amp = [10^(-0.30) 10^(-0.00) 10^(-0.20) 10^(-0.6) 10^(-0.8) 10^(-1.0)];
 
 %% Calculate Delay:
