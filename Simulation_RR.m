@@ -30,9 +30,9 @@ num_select = 2;                     % # of user selected for each combination
 [combination_table, tot_combinations] = create_combination_table( num_users, num_select );
 
 %% Simulation parameters:
-num_drops = 1;
+num_drops = 5;
 time_interval = 10;
-trial_per_drop = 1;
+trial_per_drop = 5;
 
 %% Initializing variables:
 plr_from_bs_all = zeros(num_drops, num_users, num_cell);              % propagation loss ratio
@@ -170,3 +170,9 @@ sum(sum(sum(sum(sum(throughput))))) / num_drops / trial_per_drop
 sum(sum(sum(sum(sum(throughput_jd))))) / num_drops / trial_per_drop
 sum(sum(sum(sum(sum(throughput_ci))))) / num_drops / trial_per_drop
 sum(sum(sum(sum(sum(throughput_ci_jd))))) / num_drops / trial_per_drop
+
+
+
+%% Metric:
+
+
