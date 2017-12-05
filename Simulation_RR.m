@@ -32,7 +32,7 @@ num_select = 2;                     % # of user selected for each combination
 %% Simulation parameters:
 num_drops = 100;
 trial_per_drop = 1;
-time_interval = 10;
+time_interval = 100;
 
 %% Saving variables:
 throughput_one_user = zeros(user_trial, num_drops, trial_per_drop, time_interval, num_rb);
@@ -179,11 +179,11 @@ for user = 1:user_trial
     end
     toc
     % output for now:
-    ave_throughput_num_users(user, 1) = sum(sum(sum(sum(throughput_one_user(user, :, :, :, :))))) / num_drops / trial_per_drop / num_rb / time_interval;
+    ave_throughput_num_users(user, 1) = sum(sum(sum(sum(throughput_one_user(user, :, :, :, :))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000);
     % sum(sum(sum(sum(sum(throughput))))) / num_drops / trial_per_drop
     % sum(sum(sum(sum(sum(throughput_jd))))) / num_drops / trial_per_drop
-    ave_throughput_num_users(user, 2) = sum(sum(sum(sum(sum(throughput_ci(user, :, :, :, :, :)))))) / num_drops / trial_per_drop / num_rb / time_interval / 2;
-    ave_throughput_num_users(user, 3) = sum(sum(sum(sum(sum(throughput_ci_jd(user, :, :, :, :)))))) / num_drops / trial_per_drop / num_rb / time_interval / 2;
+    ave_throughput_num_users(user, 2) = sum(sum(sum(sum(sum(throughput_ci(user, :, :, :, :, :)))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000);
+    ave_throughput_num_users(user, 3) = sum(sum(sum(sum(sum(throughput_ci_jd(user, :, :, :, :)))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000);
     
     ave_throughput_num_users
     
@@ -195,7 +195,7 @@ end
 
 figure(1)
 plot(users,ave_throughput_num_users(:, 1),'-y','LineWidth',3)
-xlim([2 30]);
+xlim([5 20]);
 hold on
 plot(users,ave_throughput_num_users(:, 2),'-.m','LineWidth',3);
 hold on
@@ -205,7 +205,7 @@ grid on
 
 legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','SouthEast')
 xlabel('Number of Users','FontName','Arial','FontSize',14)
-ylabel('Average Throughput','FontName','Arial','FontSize',14)
+ylabel('Average Throughput (bit / resource block / time)','FontName','Arial','FontSize',14)
 set(gca,'FontName','Arial','FontSize',10)
 hold off
 
