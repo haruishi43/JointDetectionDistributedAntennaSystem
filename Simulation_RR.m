@@ -43,8 +43,8 @@ channel_response = zeros(num_users, num_cell, num_rb);
 
 %% Saving variables:
 throughput_one_user = zeros(num_drops, trial_per_drop, time_interval, num_rb);
-throughput = zeros(num_drops, trial_per_drop, time_interval, num_rb, num_select);
-throughput_jd = zeros(num_drops, trial_per_drop, time_interval, num_rb, num_select);
+% throughput = zeros(num_drops, trial_per_drop, time_interval, num_rb, num_select);
+% throughput_jd = zeros(num_drops, trial_per_drop, time_interval, num_rb, num_select);
 throughput_ci = zeros(num_drops, trial_per_drop, time_interval, num_rb, num_select);
 throughput_ci_jd = zeros(num_drops, trial_per_drop, time_interval, num_rb, num_select);
 
@@ -124,8 +124,8 @@ for drop = 1:num_drops
         connection_jd = 8 * ones(time_interval, num_rb, num_users);
         
         ccc_output_one_user = zeros(time_interval, num_rb);
-        ccc_output = zeros(time_interval, num_rb, num_select);
-        ccc_output_jd = zeros(time_interval, num_rb, num_select);
+%         ccc_output = zeros(time_interval, num_rb, num_select);
+%         ccc_output_jd = zeros(time_interval, num_rb, num_select);
         ccc_output_ci = zeros(time_interval, num_rb, num_select);
         ccc_output_ci_jd = zeros(time_interval, num_rb, num_select);
         
@@ -135,7 +135,9 @@ for drop = 1:num_drops
                 ccc_output_one_user(t, rb) = single_user_scheduling( current_user, all_signal_power(:, :, rb), all_signal_power_outer(:, :, :, rb), noise_power, ccc_table );
                 
               %% Round-Robin scheduling with Max-C  
-                [ ccc_output(t, rb, :), ccc_output_jd(t, rb, :), ~, ~, ~ ] = rr_max_c( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), all_signal_power_outer(:, :, :, rb), noise_power, ccc_table );
+                % not a proper scheduling algorithm (so won't be using it
+                % anytime soon...)
+                %[ ccc_output(t, rb, :), ccc_output_jd(t, rb, :), ~, ~, ~ ] = rr_max_c( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), all_signal_power_outer(:, :, :, rb), noise_power, ccc_table );
                 
               %% Round-Robin schedulig with Max-C/I
                 [ ccc_output_ci(t, rb, :), ccc_output_ci_jd(t, rb, :), connection(t, rb, :), connection_jd(t, rb, :) ] = rr_max_ci( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), all_signal_power_outer(:, :, :, rb), noise_power, ccc_table );
@@ -155,8 +157,8 @@ for drop = 1:num_drops
         toc
         
         throughput_one_user(drop, trial, :, :) = ccc_output_one_user;
-        throughput(drop, trial, :, :, :) = ccc_output;
-        throughput_jd(drop, trial, :, :, :) = ccc_output_jd;
+%         throughput(drop, trial, :, :, :) = ccc_output;
+%         throughput_jd(drop, trial, :, :, :) = ccc_output_jd;
         throughput_ci(drop, trial, :, :, :) = ccc_output_ci;
         throughput_ci_jd(drop, trial, :, :, :) = ccc_output_ci_jd;
         
@@ -166,8 +168,8 @@ end
 
 % output for now:
 sum(sum(sum(sum(throughput_one_user)))) / num_drops / trial_per_drop
-sum(sum(sum(sum(sum(throughput))))) / num_drops / trial_per_drop
-sum(sum(sum(sum(sum(throughput_jd))))) / num_drops / trial_per_drop
+% sum(sum(sum(sum(sum(throughput))))) / num_drops / trial_per_drop
+% sum(sum(sum(sum(sum(throughput_jd))))) / num_drops / trial_per_drop
 sum(sum(sum(sum(sum(throughput_ci))))) / num_drops / trial_per_drop
 sum(sum(sum(sum(sum(throughput_ci_jd))))) / num_drops / trial_per_drop
 
