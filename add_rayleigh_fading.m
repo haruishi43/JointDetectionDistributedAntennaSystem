@@ -19,7 +19,7 @@ end
 
 %% Variables:
 num_sc = num_rb * num_sc_in_rb;     % # of total subcarriers
-num_paths = 3;                      % # of paths based on Jake's model
+num_paths = 6;                      % # of paths based on Jake's model
 rms_delay_spread = 1.0 * 10^(-6);   % root mean square of delay spread
 interval = 1 / band;                % sampling interval for Jake's model
 
