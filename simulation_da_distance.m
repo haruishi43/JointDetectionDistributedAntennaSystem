@@ -7,11 +7,13 @@ ccc_table = load('CCCtable_2antenna', ...
 rng('Shuffle');
 
 %% Model parameters:
-users = [5 10 15 20];
-user_trial = numel(users);
+num_users = 10;                   % # of users
 num_cell = 7;                       % # of cell
 num_outer_macro = 6;
 preset_coordinates = [1 3 5 6 7];   % For Coordinate Testing (has to change when num_users change)
+
+dist = [ 50 100 150 200 250 300 ];  % distance array
+num_dist = numel(dist);             % # of distnace trial
 
 num_rb = 24;                        % # of resource blocks in 1 OFDM symbol
 num_sc_in_rb = 12;                  % # of subcarriers in resource blocks
@@ -28,32 +30,29 @@ eirp = 0 + 30;
 
 % Scheduling parameters
 num_select = 2;                     % # of user selected for each combination
+% Scheduling Combinations
+[combination_table, tot_combinations] = create_combination_table( num_users, num_select );
 
 %% Simulation parameters:
-num_drops = 100;
-trial_per_drop = 1;
-time_interval = 100;
+num_drops = 200;
+trial_per_drop = 40;
+time_interval = 50;
 
 %% Saving variables:
-throughput_one_user = zeros(user_trial, num_drops, trial_per_drop, time_interval, num_rb);
-% throughput = zeros(user_trial, num_drops, trial_per_drop, time_interval, num_rb, num_select);
-% throughput_jd = zeros(user_trial, num_drops, trial_per_drop, time_interval, num_rb, num_select);
-throughput_ci = zeros(user_trial, num_drops, trial_per_drop, time_interval, num_rb, num_select);
-throughput_ci_jd = zeros(user_trial, num_drops, trial_per_drop, time_interval, num_rb, num_select);
+throughput_one_user = zeros(num_dist, num_drops, trial_per_drop, time_interval, num_rb);
+throughput_ci = zeros(num_dist, num_drops, trial_per_drop, time_interval, num_rb, num_select);
+throughput_ci_jd = zeros(num_dist, num_drops, trial_per_drop, time_interval, num_rb, num_select);
 
 % 1: 1 user scheduling
 % 2: max-ci without jd
 % 3: max-ci with jd
-ave_throughput_num_users = zeros(user_trial, 3);
+ave_throughput_distance = zeros(num_dist, 3);
 
-for user = 1:user_trial
-    user
-    %% Model parameters:
-    num_users = users(user);                   % # of users
+
+for d = 1:num_dist
     
-    % Scheduling Combinations
-    [combination_table, tot_combinations] = create_combination_table( num_users, num_select );
-
+    distance = dist(d)
+    
     %% Initializing variables:
     plr_from_bs_all = zeros(num_drops, num_users, num_cell);              % propagation loss ratio
     plr_from_outer_cell = zeros(num_drops, num_outer_macro, num_users, num_cell);          % propagation loss ratio from outer cell
@@ -62,10 +61,10 @@ for user = 1:user_trial
     channel_response = zeros(num_users, num_cell, num_rb);
 
     %% Create coordinates for each BS:
-    antenna_coordinates = create_bs_coordinate();
+    antenna_coordinates = create_bs_coordinate( distance );
 
     %% Create outer cell coordinates:
-    outer_cell_coordinates = create_outer_cell_coordinates();
+    outer_cell_coordinates = create_outer_cell_coordinates( distance );
 
     %% Simulation loop (change user placement): 
     tic
@@ -137,8 +136,6 @@ for user = 1:user_trial
             connection_jd = 8 * ones(time_interval, num_rb, num_users);
 
             ccc_output_one_user = zeros(time_interval, num_rb);
-    %         ccc_output = zeros(time_interval, num_rb, num_select);
-    %         ccc_output_jd = zeros(time_interval, num_rb, num_select);
             ccc_output_ci = zeros(time_interval, num_rb, num_select);
             ccc_output_ci_jd = zeros(time_interval, num_rb, num_select);
 
@@ -168,43 +165,40 @@ for user = 1:user_trial
                 end
             end
 
-            throughput_one_user(user, drop, trial, :, :) = ccc_output_one_user;
-    %         throughput(user, drop, trial, :, :, :) = ccc_output;
-    %         throughput_jd(user, drop, trial, :, :, :) = ccc_output_jd;
-            throughput_ci(user, drop, trial, :, :, :) = ccc_output_ci;
-            throughput_ci_jd(user, drop, trial, :, :, :) = ccc_output_ci_jd;
+            throughput_one_user(d, drop, trial, :, :) = ccc_output_one_user;
+            throughput_ci(d, drop, trial, :, :, :) = ccc_output_ci;
+            throughput_ci_jd(d, drop, trial, :, :, :) = ccc_output_ci_jd;
 
         end
-        
+
     end
     toc
     % output for now:
-    ave_throughput_num_users(user, 1) = sum(sum(sum(sum(throughput_one_user(user, :, :, :, :))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000);
+    ave_throughput_distance(d, 1) = sum(sum(sum(sum(throughput_one_user(d, :, :, :, :))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000);
     % sum(sum(sum(sum(sum(throughput))))) / num_drops / trial_per_drop
     % sum(sum(sum(sum(sum(throughput_jd))))) / num_drops / trial_per_drop
-    ave_throughput_num_users(user, 2) = sum(sum(sum(sum(sum(throughput_ci(user, :, :, :, :, :)))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000);
-    ave_throughput_num_users(user, 3) = sum(sum(sum(sum(sum(throughput_ci_jd(user, :, :, :, :)))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000);
-    
-    ave_throughput_num_users
-    
-end
+    ave_throughput_distance(d, 2) = sum(sum(sum(sum(sum(throughput_ci(d, :, :, :, :, :)))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000);
+    ave_throughput_distance(d, 3) = sum(sum(sum(sum(sum(throughput_ci_jd(d, :, :, :, :)))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000);
 
+    ave_throughput_distance
+end
+    
+    
 %% Metric:
 
 %% Plot Average Throughput vs. Number of Users:
 
 figure(1)
-plot(users,ave_throughput_num_users(:, 1),'-y','LineWidth',3)
-xlim([5 20]);
+plot(dist,ave_throughput_distance(:, 1),'-y','LineWidth',3)
 hold on
-plot(users,ave_throughput_num_users(:, 2),'-.m','LineWidth',3);
+plot(dist,ave_throughput_distance(:, 2),'-.m','LineWidth',3);
 hold on
-plot(users,ave_throughput_num_users(:, 3),'-.c','LineWidth',3);
+plot(dist,ave_throughput_distance(:, 3),'-.c','LineWidth',3);
 hold on
 grid on
 
 legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','SouthEast')
-xlabel('Number of Users','FontName','Arial','FontSize',14)
+xlabel('Distance (m)','FontName','Arial','FontSize',14)
 ylabel('Average Throughput (bit / resource block / sec)','FontName','Arial','FontSize',14)
 set(gca,'FontName','Arial','FontSize',10)
 hold off
