@@ -205,7 +205,7 @@ grid on
 
 legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','SouthEast')
 xlabel('Number of Users','FontName','Arial','FontSize',14)
-ylabel('Average Throughput (bit / resource block / time)','FontName','Arial','FontSize',14)
+ylabel('Average Throughput (bit / resource block / sec)','FontName','Arial','FontSize',14)
 set(gca,'FontName','Arial','FontSize',10)
 hold off
 
