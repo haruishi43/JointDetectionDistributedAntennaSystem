@@ -34,8 +34,8 @@ num_select = 2;                     % # of user selected for each combination
 [combination_table, tot_combinations] = create_combination_table( num_users, num_select );
 
 %% Simulation parameters:
-num_drops = 200;
-trial_per_drop = 40;
+num_drops = 50;
+trial_per_drop = 5;
 time_interval = 50;
 
 %% Saving variables:
