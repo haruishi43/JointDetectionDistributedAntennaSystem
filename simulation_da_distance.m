@@ -34,9 +34,9 @@ num_select = 2;                     % # of user selected for each combination
 [combination_table, tot_combinations] = create_combination_table( num_users, num_select );
 
 %% Simulation parameters:
-num_drops = 50;
-trial_per_drop = 5;
-time_interval = 50;
+num_drops = 20;
+trial_per_drop = 3;
+time_interval = 10;
 
 %% Saving variables:
 throughput_one_user = zeros(num_dist, num_drops, trial_per_drop, time_interval, num_rb);
@@ -47,6 +47,7 @@ throughput_ci_jd = zeros(num_dist, num_drops, trial_per_drop, time_interval, num
 % 2: max-ci without jd
 % 3: max-ci with jd
 ave_throughput_distance = zeros(num_dist, 3);
+ave_throughput_per_distance = zeros(num_dist, 3);
 
 
 for d = 1:num_dist
@@ -180,7 +181,12 @@ for d = 1:num_dist
     ave_throughput_distance(d, 2) = sum(sum(sum(sum(sum(throughput_ci(d, :, :, :, :, :)))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000);
     ave_throughput_distance(d, 3) = sum(sum(sum(sum(sum(throughput_ci_jd(d, :, :, :, :)))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000);
 
-    ave_throughput_distance
+    % area of hexagon
+    area = 6 * distance^2 / (4*sqrt(3));
+    ave_throughput_per_distance(d, 1) = sum(sum(sum(sum(throughput_one_user(d, :, :, :, :))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000) / area;
+    ave_throughput_per_distance(d, 2) = sum(sum(sum(sum(sum(throughput_ci(d, :, :, :, :, :)))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000) / area;
+    ave_throughput_per_distance(d, 3) = sum(sum(sum(sum(sum(throughput_ci_jd(d, :, :, :, :)))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000) / area;
+    
 end
     
     
@@ -200,6 +206,21 @@ grid on
 legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','SouthEast')
 xlabel('Distance (m)','FontName','Arial','FontSize',14)
 ylabel('Average Throughput (bit / resource block / sec)','FontName','Arial','FontSize',14)
+set(gca,'FontName','Arial','FontSize',10)
+hold off
+
+figure(2)
+plot(dist,ave_throughput_per_distance(:, 1),'-y','LineWidth',3)
+hold on
+plot(dist,ave_throughput_per_distance(:, 2),'-.m','LineWidth',3);
+hold on
+plot(dist,ave_throughput_per_distance(:, 3),'-.c','LineWidth',3);
+hold on
+grid on
+
+legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','SouthEast')
+xlabel('Distance (m)','FontName','Arial','FontSize',14)
+ylabel('Average Throughput (bit / resource block / sec / m^2)','FontName','Arial','FontSize',14)
 set(gca,'FontName','Arial','FontSize',10)
 hold off
 
