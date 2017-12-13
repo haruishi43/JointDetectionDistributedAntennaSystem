@@ -34,16 +34,9 @@ trial_per_drop = 2;
 time_interval = 3;
 
 %% Saving variables:
-throughput_one_user = zeros(num_drops, trial_per_drop, time_interval, num_rb);
-% throughput = zeros(user_trial, num_drops, trial_per_drop, time_interval, num_rb, num_select);
-% throughput_jd = zeros(user_trial, num_drops, trial_per_drop, time_interval, num_rb, num_select);
-throughput_ci = zeros(num_drops, trial_per_drop, time_interval, num_rb, num_select);
-throughput_ci_jd = zeros(num_drops, trial_per_drop, time_interval, num_rb, num_select);
-
-% 1: 1 user scheduling
-% 2: max-ci without jd
-% 3: max-ci with jd
-ave_throughput_num_users = zeros(1, 3);
+all_throughput_single = zeros(num_drops, trial_per_drop, time_interval, num_rb);
+all_throughputs_ci = zeros(num_drops, trial_per_drop, time_interval, num_rb, 2);
+all_throughputs_ci_jd = zeros(num_drops, trial_per_drop, time_interval, num_rb, 2);
 
 % Scheduling Combinations
 [combination_table, tot_combinations] = create_combination_table( num_users, num_select );
@@ -131,8 +124,6 @@ for drop = 1:num_drops
         connection_jd = 8 * ones(time_interval, num_rb, num_users);
 
         ccc_output_one_user = zeros(time_interval, num_rb);
-%         ccc_output = zeros(time_interval, num_rb, num_select);
-%         ccc_output_jd = zeros(time_interval, num_rb, num_select);
         ccc_output_ci = zeros(time_interval, num_rb, num_select);
         ccc_output_ci_jd = zeros(time_interval, num_rb, num_select);
 
@@ -140,7 +131,7 @@ for drop = 1:num_drops
             for rb = 1:num_rb
               %% Max-C(/I) scheduling for single user
                 ccc_output_one_user(t, rb) = single_user_scheduling( current_user, all_signal_power(:, :, rb), all_signal_power_outer(:, :, :, rb), noise_power, ccc_table );
-
+                
               %% Round-Robin scheduling with Max-C  
                 % not a proper scheduling algorithm (so won't be using it
                 % anytime soon...)
@@ -161,21 +152,15 @@ for drop = 1:num_drops
                 end
             end
         end
-
-        throughput_one_user(drop, trial, :, :) = ccc_output_one_user;
-        throughput_ci(drop, trial, :, :, :) = ccc_output_ci;
-        throughput_ci_jd(drop, trial, :, :, :) = ccc_output_ci_jd;
+        
+        all_throughput_single(drop, trial, :, :) = ccc_output_one_user;
+        all_throughputs_ci(drop, trial, :, :, :) = ccc_output_ci;
+        all_throughputs_ci_jd(drop, trial, :, :, :) = ccc_output_ci_jd;
 
     end
 
 end
 toc
-% output for now:
-ave_throughput_num_users(1, 1) = sum(sum(sum(sum(throughput_one_user(:, :, :, :))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000);
-ave_throughput_num_users(1, 2) = sum(sum(sum(sum(sum(throughput_ci(:, :, :, :, :)))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000);
-ave_throughput_num_users(1, 3) = sum(sum(sum(sum(sum(throughput_ci_jd(:, :, :, :, :)))))) / num_drops / trial_per_drop / num_rb / time_interval * (7/0.5 * 1000);
-
-ave_throughput_num_users
 
 %% Metric:
 
@@ -200,3 +185,40 @@ ave_throughput_num_users
 
 %% CDF
 
+numel(all_throughput_single)
+numel(all_throughputs_ci)
+numel(all_throughputs_ci_jd)
+
+x = 0:0.001:8;
+
+y_1 = zeros(x, 1);
+y_2 = zeros(x, 1);
+y_3 = zeros(x, 1);
+
+for i = x
+    
+    for drop = 1:num_drops
+        
+        for trial = 1:trial_per_drop
+            
+            for t = 1:time_interval
+                
+                for rb = 1: num_rb
+                    
+                    a = all_throughput_single(drop, trial, t, rb);
+                    
+                    for user = 1:num_select
+                        
+                        
+                        
+                    end
+                    
+                end
+                
+            end
+            
+        end
+        
+    end
+    
+end
