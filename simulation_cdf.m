@@ -191,34 +191,33 @@ numel(all_throughputs_ci_jd)
 
 x = 0:0.001:8;
 
-y_1 = zeros(x, 1);
-y_2 = zeros(x, 1);
-y_3 = zeros(x, 1);
+x_1 = reshape(all_throughput_single, [num_drops*trial_per_drop*time_interval*num_rb, 1]);
+x_2 = reshape(all_throughputs_ci, [num_drops*trial_per_drop*time_interval*num_rb*num_select, 1]);
+x_3 = reshape(all_throughputs_ci_jd, [num_drops*trial_per_drop*time_interval*num_rb*num_select, 1]);
 
-for i = x
-    
-    for drop = 1:num_drops
-        
-        for trial = 1:trial_per_drop
-            
-            for t = 1:time_interval
-                
-                for rb = 1: num_rb
-                    
-                    a = all_throughput_single(drop, trial, t, rb);
-                    
-                    for user = 1:num_select
-                        
-                        
-                        
-                    end
-                    
-                end
-                
-            end
-            
-        end
-        
-    end
-    
-end
+
+figure(1)
+
+[counts, bins] = hist(x_1, 1000);
+cdf = cumsum(counts) / sum(counts);
+plot(bins, cdf);
+hold on
+
+[counts, bins] = hist(x_2, 1000);
+cdf = cumsum(counts) / sum(counts);
+plot(bins, cdf);
+hold on
+
+[counts, bins] = hist(x_3, 1000);
+cdf = cumsum(counts) / sum(counts);
+plot(bins, cdf);
+hold on
+ylabel('Percentage (%)', 'FontSize', 20);
+xlabel('Values (bit/RB/MT)', 'FontSize', 20);
+legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','NorthWest')
+hold off
+
+
+
+
+
