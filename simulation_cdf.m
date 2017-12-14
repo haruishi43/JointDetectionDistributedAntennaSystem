@@ -184,17 +184,9 @@ toc
 
 
 %% CDF
-
-numel(all_throughput_single)
-numel(all_throughputs_ci)
-numel(all_throughputs_ci_jd)
-
-x = 0:0.001:8;
-
 x_1 = reshape(all_throughput_single, [num_drops*trial_per_drop*time_interval*num_rb, 1]);
 x_2 = reshape(all_throughputs_ci, [num_drops*trial_per_drop*time_interval*num_rb*num_select, 1]);
 x_3 = reshape(all_throughputs_ci_jd, [num_drops*trial_per_drop*time_interval*num_rb*num_select, 1]);
-
 
 figure(1)
 
