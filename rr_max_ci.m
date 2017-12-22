@@ -113,6 +113,6 @@ connection(1, u2) = cell_pair(2);
 
 connection_jd(1, u1) = cell_pair_jd(1);
 connection_jd(1, u2) = cell_pair_jd(2);
-best_mod
+
 end
 

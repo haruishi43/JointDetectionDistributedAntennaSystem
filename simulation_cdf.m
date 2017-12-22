@@ -29,9 +29,9 @@ eirp = 0 + 30;
 num_select = 2;                     % # of user selected for each combination
 
 %% Simulation parameters:
-num_drops = 5;
-trial_per_drop = 2;
-time_interval = 3;
+num_drops = 30;
+trial_per_drop = 3;
+time_interval = 15;
 
 %% Saving variables:
 all_throughput_single = zeros(num_drops, trial_per_drop, time_interval, num_rb);
@@ -184,9 +184,36 @@ toc
 
 
 %% CDF
+% x_1 = reshape(all_throughput_single, [num_drops*trial_per_drop*time_interval*num_rb, 1]);
+% x_2 = reshape(all_throughputs_ci, [num_drops*trial_per_drop*time_interval*num_rb*num_select, 1]);
+% x_3 = reshape(all_throughputs_ci_jd, [num_drops*trial_per_drop*time_interval*num_rb*num_select, 1]);
+% 
+% figure(1)
+% 
+% [counts, bins] = hist(x_1, 1000);
+% cdf = cumsum(counts) / sum(counts);
+% plot(bins, cdf);
+% hold on
+% 
+% [counts, bins] = hist(x_2, 1000);
+% cdf = cumsum(counts) / sum(counts);
+% plot(bins, cdf);
+% hold on
+% 
+% [counts, bins] = hist(x_3, 1000);
+% cdf = cumsum(counts) / sum(counts);
+% plot(bins, cdf);
+% hold on
+% ylabel('Percentage (%)', 'FontSize', 20);
+% xlabel('Values (bit/RB/MT)', 'FontSize', 20);
+% legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','NorthWest')
+% hold off
+
 x_1 = reshape(all_throughput_single, [num_drops*trial_per_drop*time_interval*num_rb, 1]);
-x_2 = reshape(all_throughputs_ci, [num_drops*trial_per_drop*time_interval*num_rb*num_select, 1]);
-x_3 = reshape(all_throughputs_ci_jd, [num_drops*trial_per_drop*time_interval*num_rb*num_select, 1]);
+xx_2 = reshape(all_throughputs_ci, [num_drops*trial_per_drop*time_interval*num_rb, num_select]);
+x_2 = sum(xx_2, 2);
+xx_3 = reshape(all_throughputs_ci_jd, [num_drops*trial_per_drop*time_interval*num_rb, num_select]);
+x_3 = sum(xx_3, 2);
 
 figure(1)
 
@@ -205,7 +232,7 @@ cdf = cumsum(counts) / sum(counts);
 plot(bins, cdf);
 hold on
 ylabel('Percentage (%)', 'FontSize', 20);
-xlabel('Values (bit/RB/MT)', 'FontSize', 20);
+xlabel('Values (bit/RB/DA)', 'FontSize', 20);
 legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','NorthWest')
 hold off
 
