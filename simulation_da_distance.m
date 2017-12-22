@@ -12,7 +12,7 @@ num_cell = 7;                       % # of cell
 num_outer_macro = 6;
 preset_coordinates = [1 3 5 6 7];   % For Coordinate Testing (has to change when num_users change)
 
-dist = [ 50 100 150 200 250 300 ];  % distance array
+dist = [ 25 50 100 150 200 250 ];  % distance array
 num_dist = numel(dist);             % # of distnace trial
 
 num_rb = 24;                        % # of resource blocks in 1 OFDM symbol
@@ -34,9 +34,9 @@ num_select = 2;                     % # of user selected for each combination
 [combination_table, tot_combinations] = create_combination_table( num_users, num_select );
 
 %% Simulation parameters:
-num_drops = 20;
+num_drops = 30;
 trial_per_drop = 3;
-time_interval = 10;
+time_interval = 15;
 
 %% Saving variables:
 throughput_one_user = zeros(num_dist, num_drops, trial_per_drop, time_interval, num_rb);
