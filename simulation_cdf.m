@@ -16,6 +16,8 @@ num_rb = 24;                        % # of resource blocks in 1 OFDM symbol
 num_sc_in_rb = 12;                  % # of subcarriers in resource blocks
 num_sc = num_rb * num_sc_in_rb;     % # of total subcarriers
 
+distance = 100;                      % intersite distance
+
 band_per_rb = 180*10^3;             % frequency band range for each rb (Hz)
 band = band_per_rb * num_rb;        % total frequency band
 
@@ -29,9 +31,9 @@ eirp = 0 + 30;
 num_select = 2;                     % # of user selected for each combination
 
 %% Simulation parameters:
-num_drops = 30;
-trial_per_drop = 3;
-time_interval = 15;
+num_drops = 500;
+trial_per_drop = 10;
+time_interval = 100;
 
 %% Saving variables:
 all_throughput_single = zeros(num_drops, trial_per_drop, time_interval, num_rb);
@@ -49,10 +51,10 @@ channel_response_freq = zeros(num_users, num_cell, num_sc);           % channel 
 channel_response = zeros(num_users, num_cell, num_rb);
 
 %% Create coordinates for each BS:
-antenna_coordinates = create_bs_coordinate();
+antenna_coordinates = create_bs_coordinate( distance );
 
 %% Create outer cell coordinates:
-outer_cell_coordinates = create_outer_cell_coordinates();
+outer_cell_coordinates = create_outer_cell_coordinates( distance );
 
 %% Simulation loop (change user placement): 
 tic
