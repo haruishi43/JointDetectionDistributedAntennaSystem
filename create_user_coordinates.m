@@ -51,7 +51,7 @@ end
 
 %% Simulation:
 
-MIN_DISTANCE = 10;      % minimum distance
+MIN_DISTANCE = 5;      % minimum distance
 coordinates = zeros(num_users, 1);
 
 for i = 1:num_users

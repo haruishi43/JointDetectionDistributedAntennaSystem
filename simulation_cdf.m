@@ -16,7 +16,7 @@ num_rb = 24;                        % # of resource blocks in 1 OFDM symbol
 num_sc_in_rb = 12;                  % # of subcarriers in resource blocks
 num_sc = num_rb * num_sc_in_rb;     % # of total subcarriers
 
-distance = 100;                      % intersite distance
+distance = 200;                      % intersite distance
 
 band_per_rb = 180*10^3;             % frequency band range for each rb (Hz)
 band = band_per_rb * num_rb;        % total frequency band
@@ -31,9 +31,9 @@ eirp = 0 + 30;
 num_select = 2;                     % # of user selected for each combination
 
 %% Simulation parameters:
-num_drops = 500;
-trial_per_drop = 10;
-time_interval = 100;
+num_drops = 100;
+trial_per_drop = 5;
+time_interval = 20;
 
 %% Saving variables:
 all_throughput_single = zeros(num_drops, trial_per_drop, time_interval, num_rb);
@@ -234,8 +234,8 @@ cdf = cumsum(counts) / sum(counts);
 plot(bins, cdf);
 hold on
 ylabel('Percentage (%)', 'FontSize', 20);
-xlabel('Values (bit/RB/DA)', 'FontSize', 20);
-legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','NorthWest')
+xlabel('Throughputs (bit / RB / sec)', 'FontSize', 20);
+legend('Single-MT','Multi-MT w/o Joint Detection','Multi-MT with Joint Detection','Location','NorthWest')
 hold off
 
 

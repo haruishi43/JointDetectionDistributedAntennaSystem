@@ -17,6 +17,8 @@ num_rb = 24;                        % # of resource blocks in 1 OFDM symbol
 num_sc_in_rb = 12;                  % # of subcarriers in resource blocks
 num_sc = num_rb * num_sc_in_rb;     % # of total subcarriers
 
+distance = 25;
+
 band_per_rb = 180*10^3;             % frequency band range for each rb (Hz)
 band = band_per_rb * num_rb;        % total frequency band
 
@@ -31,8 +33,8 @@ num_select = 2;                     % # of user selected for each combination
 
 %% Simulation parameters:
 num_drops = 100;
-trial_per_drop = 1;
-time_interval = 100;
+trial_per_drop = 2;
+time_interval = 30;
 
 %% Saving variables:
 throughput_one_user = zeros(user_trial, num_drops, trial_per_drop, time_interval, num_rb);
@@ -62,10 +64,10 @@ for user = 1:user_trial
     channel_response = zeros(num_users, num_cell, num_rb);
 
     %% Create coordinates for each BS:
-    antenna_coordinates = create_bs_coordinate();
+    antenna_coordinates = create_bs_coordinate( distance );
 
     %% Create outer cell coordinates:
-    outer_cell_coordinates = create_outer_cell_coordinates();
+    outer_cell_coordinates = create_outer_cell_coordinates( distance );
 
     %% Simulation loop (change user placement): 
     tic
@@ -203,9 +205,9 @@ plot(users,ave_throughput_num_users(:, 3),'-.c','LineWidth',3);
 hold on
 grid on
 
-legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','SouthEast')
-xlabel('Number of Users','FontName','Arial','FontSize',14)
-ylabel('Average Throughput (bit / resource block / sec)','FontName','Arial','FontSize',14)
+legend('Single-MT','Multi-MT w/o Joint Detection','Multi-MT with Joint Detection','Location','NorthWest')
+xlabel('Number of MTs (N_{MT})','FontName','Arial','FontSize',14)
+ylabel('Average Throughput (bit / RB / sec)','FontName','Arial','FontSize',14)
 set(gca,'FontName','Arial','FontSize',10)
 hold off
 
