@@ -31,9 +31,9 @@ eirp = 0 + 30;
 num_select = 2;                     % # of user selected for each combination
 
 %% Simulation parameters:
-num_drops = 100;
-trial_per_drop = 5;
-time_interval = 20;
+num_drops = 500;
+trial_per_drop = 10;
+time_interval = 30;
 
 %% Saving variables:
 all_throughput_single_ri = zeros(num_drops, trial_per_drop, time_interval, num_rb);
@@ -234,7 +234,55 @@ hold on
 
 ylabel('Percentage (%)', 'FontSize', 16);
 xlabel('Throughputs (bit / RB / sec)', 'FontSize', 16);
-legend('Single-MT (Rician)','Multi-MT w/o Joint Detection (Rician)','Multi-MT with Joint Detection (Rician)','Single-MT (Rayleigh)','Multi-MT w/o Joint Detection (Rayleigh)','Multi-MT with Joint Detection (Rayleigh)', 'Location','NorthWest', 'FontSize', 14)
+legend('Single-MT (Rician)','Multi-MT w/o Joint Detection (Rician)','Multi-MT with Joint Detection (Rician)','Single-MT (Rayleigh)','Multi-MT w/o Joint Detection (Rayleigh)','Multi-MT with Joint Detection (Rayleigh)', 'Location','NorthWest')
+hold off
+
+
+% Rician
+figure(2)
+
+[counts, bins] = hist(x_1_ri, 1000);
+cdf = cumsum(counts) / sum(counts);
+plot(bins, cdf, '-.','LineWidth', 2);
+hold on
+
+[counts, bins] = hist(x_2_ri, 1000);
+cdf = cumsum(counts) / sum(counts);
+plot(bins, cdf, '--','LineWidth', 2);
+hold on
+
+[counts, bins] = hist(x_3_ri, 1000);
+cdf = cumsum(counts) / sum(counts);
+plot(bins, cdf, '-','LineWidth', 2);
+hold on
+
+ylabel('Percentage (%)', 'FontSize', 16);
+xlabel('Throughputs (bit / RB / sec)', 'FontSize', 16);
+legend('Single-MT','Multi-MT w/o Joint Detection','Multi-MT with Joint Detection', 'Location','NorthWest')
+hold off
+
+
+% Rayleigh
+figure(3)
+
+[counts, bins] = hist(x_1_ray, 1000);
+cdf = cumsum(counts) / sum(counts);
+plot(bins, cdf, '-.','LineWidth', 2);
+hold on
+
+[counts, bins] = hist(x_2_ray, 1000);
+cdf = cumsum(counts) / sum(counts);
+plot(bins, cdf, '--','LineWidth', 2);
+hold on
+
+[counts, bins] = hist(x_3_ray, 1000);
+cdf = cumsum(counts) / sum(counts);
+plot(bins, cdf, '-','LineWidth', 2);
+hold on
+
+ylabel('Percentage (%)', 'FontSize', 16);
+xlabel('Throughputs (bit / RB / sec)', 'FontSize', 16);
+legend('Single-MT','Multi-MT w/o Joint Detection','Multi-MT with Joint Detection', 'Location','NorthWest')
 hold off
 
 
