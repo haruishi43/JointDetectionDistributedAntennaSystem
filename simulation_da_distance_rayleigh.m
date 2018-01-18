@@ -194,20 +194,20 @@ end
 
 %% Plot Average Throughput vs. Number of Users:
 
-figure(1)
-plot(dist,ave_throughput_distance(:, 1),'-','LineWidth',3)
-hold on
-plot(dist,ave_throughput_distance(:, 2),'-.','LineWidth',3);
-hold on
-plot(dist,ave_throughput_distance(:, 3),':','LineWidth',3);
-hold on
-grid on
-
-legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','SouthEast')
-xlabel('Distance (m)','FontName','Arial','FontSize',14)
-ylabel('Average Throughput (bit / resource block / sec)','FontName','Arial','FontSize',14)
-set(gca,'FontName','Arial','FontSize',10)
-hold off
+% figure(1)
+% plot(dist,ave_throughput_distance(:, 1),'-','LineWidth',3)
+% hold on
+% plot(dist,ave_throughput_distance(:, 2),'-.','LineWidth',3);
+% hold on
+% plot(dist,ave_throughput_distance(:, 3),':','LineWidth',3);
+% hold on
+% grid on
+% 
+% legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','SouthEast')
+% xlabel('Distance (m)','FontName','Arial','FontSize',14)
+% ylabel('Average Throughput (bit / resource block / sec)','FontName','Arial','FontSize',14)
+% set(gca,'FontName','Arial','FontSize',10)
+% hold off
 
 figure(2)
 plot(dist,ave_throughput_per_distance(:, 1),'-','LineWidth',3)
@@ -218,7 +218,7 @@ plot(dist,ave_throughput_per_distance(:, 3),':','LineWidth',3);
 hold on
 grid on
 
-legend('Single-Mt','Multi-MT w/o Joint Detection','Multi-MT with Joint Detection','Location','NorthWest')
+legend('Single-MT','Multi-MT w/o Joint Detection','Multi-MT with Joint Detection','Location','NorthWest')
 xlabel('Distance (m)','FontName','Arial','FontSize',14)
 ylabel('Average Throughput (bit / RB / sec / m^2)','FontName','Arial','FontSize',14)
 set(gca,'FontName','Arial','FontSize',10)
