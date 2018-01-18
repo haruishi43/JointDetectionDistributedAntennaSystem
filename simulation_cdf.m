@@ -16,7 +16,7 @@ num_rb = 24;                        % # of resource blocks in 1 OFDM symbol
 num_sc_in_rb = 12;                  % # of subcarriers in resource blocks
 num_sc = num_rb * num_sc_in_rb;     % # of total subcarriers
 
-distance = 200;                      % intersite distance
+distance = 25;                      % intersite distance
 
 band_per_rb = 180*10^3;             % frequency band range for each rb (Hz)
 band = band_per_rb * num_rb;        % total frequency band
