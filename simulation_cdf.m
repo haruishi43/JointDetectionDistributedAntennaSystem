@@ -40,6 +40,14 @@ all_throughput_single = zeros(num_drops, trial_per_drop, time_interval, num_rb);
 all_throughputs_ci = zeros(num_drops, trial_per_drop, time_interval, num_rb, 2);
 all_throughputs_ci_jd = zeros(num_drops, trial_per_drop, time_interval, num_rb, 2);
 
+%% debugging:
+debugging_ci_pow = zeros(num_drops, trial_per_drop, time_interval, num_rb, 2);
+debugging_ci_jd_pow = zeros(num_drops, trial_per_drop, time_interval, num_rb, 2);
+debugging_ci_alpha = zeros(num_drops, trial_per_drop, time_interval, num_rb, 2);
+debugging_ci_jd_alpha = zeros(num_drops, trial_per_drop, time_interval, num_rb, 2);
+debugging_ci_mod = zeros(num_drops, trial_per_drop, time_interval, num_rb, 2);
+debugging_ci_jd_mod = zeros(num_drops, trial_per_drop, time_interval, num_rb, 2);
+
 % Scheduling Combinations
 [combination_table, tot_combinations] = create_combination_table( num_users, num_select );
 
@@ -128,6 +136,10 @@ for drop = 1:num_drops
         ccc_output_one_user = zeros(time_interval, num_rb);
         ccc_output_ci = zeros(time_interval, num_rb, num_select);
         ccc_output_ci_jd = zeros(time_interval, num_rb, num_select);
+        
+        % for debugging:
+        debugging = zeros(2, 3);
+        debugging_jd = zeros(2, 3);
 
         for t = 1:time_interval
             for rb = 1:num_rb
@@ -140,7 +152,7 @@ for drop = 1:num_drops
                 %[ ccc_output(t, rb, :), ccc_output_jd(t, rb, :), ~, ~, ~ ] = rr_max_c( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), all_signal_power_outer(:, :, :, rb), noise_power, ccc_table );
 
               %% Round-Robin schedulig with Max-C/I
-                [ ccc_output_ci(t, rb, :), ccc_output_ci_jd(t, rb, :), connection(t, rb, :), connection_jd(t, rb, :) ] = rr_max_ci( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), all_signal_power_outer(:, :, :, rb), noise_power, ccc_table );
+                [ ccc_output_ci(t, rb, :), ccc_output_ci_jd(t, rb, :), connection(t, rb, :), connection_jd(t, rb, :), debugging(:, :), debugging_jd(:, :) ] = rr_max_ci( num_users, combination_table(current_comb,:), all_signal_power(:, :, rb), all_signal_power_outer(:, :, :, rb), noise_power, ccc_table );
 
               %% increment
                 current_comb = current_comb + 1;
@@ -152,6 +164,14 @@ for drop = 1:num_drops
                 if current_user > num_users
                     current_user = 1;
                 end
+                
+                %% debugging:
+                debugging_ci_pow(drop, trial, t, rb, :) = debugging(:, 1);
+                debugging_ci_jd_pow(drop, trial, t, rb, :) = debugging_jd(:, 1);
+                debugging_ci_alpha(drop, trial, t, rb, :) = debugging(:, 2);
+                debugging_ci_jd_alpha(drop, trial, t, rb, :) = debugging_jd(:, 2);
+                debugging_ci_mod(drop, trial, t, rb, :) = debugging(:, 3);
+                debugging_ci_jd_mod(drop, trial, t, rb, :) = debugging_jd(:, 3);
             end
         end
         

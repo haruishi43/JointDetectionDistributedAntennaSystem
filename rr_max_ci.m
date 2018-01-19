@@ -1,4 +1,4 @@
-function [ ccc_output, ccc_output_jd, connection, connection_jd ] = rr_max_ci( num_users, combination, current_signal, all_signal_power_outer, noise, ccc_table )
+function [ ccc_output, ccc_output_jd, connection, connection_jd, debugging, debugging_jd ] = rr_max_ci( num_users, combination, current_signal, all_signal_power_outer, noise, ccc_table )
 % Round-Robin scheduling with Max-C/I scheduling 
 
 % update best throughput modulation
@@ -113,6 +113,9 @@ connection(1, u2) = cell_pair(2);
 
 connection_jd(1, u1) = cell_pair_jd(1);
 connection_jd(1, u2) = cell_pair_jd(2);
+
+debugging = [ [best_pow(1) best_alpha(1) best_mod(1)]; [best_pow(2) best_alpha(2) best_mod(2)] ];
+debugging_jd = [ [best_pow_jd(1) best_alpha_jd(1) best_mod_jd(1)]; [best_pow_jd(2) best_alpha_jd(2) best_mod_jd(2)] ];
 
 end
 
