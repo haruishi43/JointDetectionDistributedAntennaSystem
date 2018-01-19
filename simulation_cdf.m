@@ -213,7 +213,15 @@ xlabel('Throughputs (bit / RB / sec)', 'FontSize', 20);
 legend('Single-MT','Multi-MT w/o Joint Detection','Multi-MT with Joint Detection','Location','NorthWest')
 hold off
 
+%% debugging
 
+debugging_ci_pow_1 = reshape(debugging_ci_pow, [num_drops*trial_per_drop*time_interval*num_rb, 2]);
+debugging_ci_jd_pow_1 = reshape(debugging_ci_jd_pow, [num_drops*trial_per_drop*time_interval*num_rb, 2]);
 
+debugging_ci_alpha_1 = reshape(debugging_ci_alpha, [num_drops*trial_per_drop*time_interval*num_rb, 2]);
+debugging_ci_jd_alpha_1 = reshape(debugging_ci_jd_alpha, [num_drops*trial_per_drop*time_interval*num_rb, 2]);
+
+debugging_ci_mod_1 = reshape(debugging_ci_mod, [num_drops*trial_per_drop*time_interval*num_rb, 2]);
+debugging_ci_jd_mod_1 = reshape(debugging_ci_jd_mod, [num_drops*trial_per_drop*time_interval*num_rb, 2]);
 
 
