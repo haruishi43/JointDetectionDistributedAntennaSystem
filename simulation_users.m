@@ -196,19 +196,19 @@ end
 %% Plot Average Throughput vs. Number of Users:
 
 figure(1)
-plot(users,ave_throughput_num_users(:, 1),'-y','LineWidth',3)
+plot(users,ave_throughput_num_users(:, 1),'-k','LineWidth',2)
 xlim([5 20]);
 hold on
-plot(users,ave_throughput_num_users(:, 2),'-.m','LineWidth',3);
+plot(users,ave_throughput_num_users(:, 2),'-.b','LineWidth',2);
 hold on
-plot(users,ave_throughput_num_users(:, 3),'-.c','LineWidth',3);
+plot(users,ave_throughput_num_users(:, 3),':r','LineWidth',2);
 hold on
 grid on
 
 legend('Single-MT','Multi-MT w/o Joint Detection','Multi-MT with Joint Detection','Location','NorthWest')
-xlabel('Number of MTs (N_{MT})','FontName','Arial','FontSize',14)
-ylabel('Average Throughput (bit / RB / sec)','FontName','Arial','FontSize',14)
-set(gca,'FontName','Arial','FontSize',10)
+xlabel('Number of MTs (N_{MT})','FontName','Arial','FontSize',20)
+ylabel('Average Throughput (bit / RB / sec)','FontName','Arial','FontSize',20)
+set(gca,'FontName','Arial','FontSize',20)
 hold off
 
 

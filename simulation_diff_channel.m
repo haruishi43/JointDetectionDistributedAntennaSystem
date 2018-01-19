@@ -210,7 +210,7 @@ for d = 1:num_dist
 
     [counts, bins] = hist(x_1_ri, 1000);
     cdf = cumsum(counts) / sum(counts);
-    plot(bins, cdf, '-y','LineWidth', 2);
+    plot(bins, cdf, '-g','LineWidth', 2);
     hold on
 
     [counts, bins] = hist(x_2_ri, 1000);
@@ -225,17 +225,17 @@ for d = 1:num_dist
 
     [counts, bins] = hist(x_1_ray, 1000);
     cdf = cumsum(counts) / sum(counts);
-    plot(bins, cdf, '-r','LineWidth', 2);
+    plot(bins, cdf, '-k','LineWidth', 2);
     hold on
 
     [counts, bins] = hist(x_2_ray, 1000);
     cdf = cumsum(counts) / sum(counts);
-    plot(bins, cdf, '-.g','LineWidth', 2);
+    plot(bins, cdf, '-.b','LineWidth', 2);
     hold on
 
     [counts, bins] = hist(x_3_ray, 1000);
     cdf = cumsum(counts) / sum(counts);
-    plot(bins, cdf, ':b','LineWidth', 2);
+    plot(bins, cdf, ':r','LineWidth', 2);
     hold on
 
 
@@ -253,17 +253,17 @@ for d = 1:num_dist
 
     [counts, bins] = hist(x_1_ri, 1000);
     cdf = cumsum(counts) / sum(counts);
-    plot(bins, cdf, '-','LineWidth', 2);
+    plot(bins, cdf, '-k','LineWidth', 2);
     hold on
 
     [counts, bins] = hist(x_2_ri, 1000);
     cdf = cumsum(counts) / sum(counts);
-    plot(bins, cdf, '-.','LineWidth', 2);
+    plot(bins, cdf, '-.b','LineWidth', 2);
     hold on
 
     [counts, bins] = hist(x_3_ri, 1000);
     cdf = cumsum(counts) / sum(counts);
-    plot(bins, cdf, ':','LineWidth', 2);
+    plot(bins, cdf, ':r','LineWidth', 2);
     hold on
 
     ylabel('Percentage (%)', 'FontSize', 16);
@@ -280,17 +280,17 @@ for d = 1:num_dist
 
     [counts, bins] = hist(x_1_ray, 1000);
     cdf = cumsum(counts) / sum(counts);
-    plot(bins, cdf, '-','LineWidth', 2);
+    plot(bins, cdf, '-k','LineWidth', 2);
     hold on
 
     [counts, bins] = hist(x_2_ray, 1000);
     cdf = cumsum(counts) / sum(counts);
-    plot(bins, cdf, '-.','LineWidth', 2);
+    plot(bins, cdf, '-.b','LineWidth', 2);
     hold on
 
     [counts, bins] = hist(x_3_ray, 1000);
     cdf = cumsum(counts) / sum(counts);
-    plot(bins, cdf, ':','LineWidth', 2);
+    plot(bins, cdf, ':r','LineWidth', 2);
     hold on
 
     ylabel('Percentage (%)', 'FontSize', 16);

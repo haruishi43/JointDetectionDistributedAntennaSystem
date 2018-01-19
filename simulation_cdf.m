@@ -31,9 +31,9 @@ eirp = 0 + 30;
 num_select = 2;                     % # of user selected for each combination
 
 %% Simulation parameters:
-num_drops = 100;
-trial_per_drop = 5;
-time_interval = 20;
+num_drops = 50;
+trial_per_drop = 2;
+time_interval = 10;
 
 %% Saving variables:
 all_throughput_single = zeros(num_drops, trial_per_drop, time_interval, num_rb);
@@ -166,51 +166,6 @@ toc
 
 %% Metric:
 
-%% Plot Average Throughput vs. Number of Users:
-
-% figure(1)
-% plot(users,ave_throughput_num_users(:, 1),'-y','LineWidth',3)
-% xlim([5 20]);
-% hold on
-% plot(users,ave_throughput_num_users(:, 2),'-.m','LineWidth',3);
-% hold on
-% plot(users,ave_throughput_num_users(:, 3),'-.c','LineWidth',3);
-% hold on
-% grid on
-% 
-% legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','SouthEast')
-% xlabel('Number of Users','FontName','Arial','FontSize',14)
-% ylabel('Average Throughput (bit / resource block / sec)','FontName','Arial','FontSize',14)
-% set(gca,'FontName','Arial','FontSize',10)
-% hold off
-
-
-%% CDF
-% x_1 = reshape(all_throughput_single, [num_drops*trial_per_drop*time_interval*num_rb, 1]);
-% x_2 = reshape(all_throughputs_ci, [num_drops*trial_per_drop*time_interval*num_rb*num_select, 1]);
-% x_3 = reshape(all_throughputs_ci_jd, [num_drops*trial_per_drop*time_interval*num_rb*num_select, 1]);
-% 
-% figure(1)
-% 
-% [counts, bins] = hist(x_1, 1000);
-% cdf = cumsum(counts) / sum(counts);
-% plot(bins, cdf);
-% hold on
-% 
-% [counts, bins] = hist(x_2, 1000);
-% cdf = cumsum(counts) / sum(counts);
-% plot(bins, cdf);
-% hold on
-% 
-% [counts, bins] = hist(x_3, 1000);
-% cdf = cumsum(counts) / sum(counts);
-% plot(bins, cdf);
-% hold on
-% ylabel('Percentage (%)', 'FontSize', 20);
-% xlabel('Values (bit/RB/MT)', 'FontSize', 20);
-% legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','NorthWest')
-% hold off
-
 x_1 = reshape(all_throughput_single, [num_drops*trial_per_drop*time_interval*num_rb, 1]);
 xx_2 = reshape(all_throughputs_ci, [num_drops*trial_per_drop*time_interval*num_rb, num_select]);
 x_2 = sum(xx_2, 2);
@@ -221,17 +176,17 @@ figure(1)
 
 [counts, bins] = hist(x_1, 1000);
 cdf = cumsum(counts) / sum(counts);
-plot(bins, cdf);
+plot(bins, cdf,'-k','LineWidth', 2);
 hold on
 
 [counts, bins] = hist(x_2, 1000);
 cdf = cumsum(counts) / sum(counts);
-plot(bins, cdf);
+plot(bins, cdf,'-.b','LineWidth', 2);
 hold on
 
 [counts, bins] = hist(x_3, 1000);
 cdf = cumsum(counts) / sum(counts);
-plot(bins, cdf);
+plot(bins, cdf,':r','LineWidth', 2);
 hold on
 ylabel('Percentage (%)', 'FontSize', 20);
 xlabel('Throughputs (bit / RB / sec)', 'FontSize', 20);

@@ -192,29 +192,12 @@ end
     
 %% Metric:
 
-%% Plot Average Throughput vs. Number of Users:
-
-% figure(1)
-% plot(dist,ave_throughput_distance(:, 1),'-y','LineWidth',3)
-% hold on
-% plot(dist,ave_throughput_distance(:, 2),'-.m','LineWidth',3);
-% hold on
-% plot(dist,ave_throughput_distance(:, 3),'-.c','LineWidth',3);
-% hold on
-% grid on
-% 
-% legend('1 User','Max-C/I w/o Joint Detection','Max-C/I with Joint Detection','Location','SouthEast')
-% xlabel('Distance (m)','FontName','Arial','FontSize',14)
-% ylabel('Average Throughput (bit / resource block / sec)','FontName','Arial','FontSize',14)
-% set(gca,'FontName','Arial','FontSize',10)
-% hold off
-
-figure(2)
-plot(dist,ave_throughput_per_distance(:, 1),'-','LineWidth',3)
+figure(1)
+plot(dist,ave_throughput_per_distance(:, 1),'-k','LineWidth',2)
 hold on
-plot(dist,ave_throughput_per_distance(:, 2),'-.','LineWidth',3);
+plot(dist,ave_throughput_per_distance(:, 2),'-.b','LineWidth',2);
 hold on
-plot(dist,ave_throughput_per_distance(:, 3),':','LineWidth',3);
+plot(dist,ave_throughput_per_distance(:, 3),':r','LineWidth',2);
 hold on
 grid on
 
