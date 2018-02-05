@@ -239,7 +239,7 @@ for d = 1:num_dist
     hold on
 
 
-    ylabel('Percentage (%)', 'FontSize', 16);
+    ylabel('Cumulative Probability', 'FontSize', 16);
     xlabel('Throughputs (bit / RB / sec)', 'FontSize', 16);
     legend('Single-MT (Rician)','Multi-MT w/o Joint Detection (Rician)','Multi-MT with Joint Detection (Rician)','Single-MT (Rayleigh)','Multi-MT w/o Joint Detection (Rayleigh)','Multi-MT with Joint Detection (Rayleigh)', 'Location','NorthWest')
     hold off
@@ -266,7 +266,7 @@ for d = 1:num_dist
     plot(bins, cdf, ':r','LineWidth', 2);
     hold on
 
-    ylabel('Percentage (%)', 'FontSize', 16);
+    ylabel('Cumulative Probability', 'FontSize', 16);
     xlabel('Throughputs (bit / RB / sec)', 'FontSize', 16);
     legend('Single-MT','Multi-MT w/o Joint Detection','Multi-MT with Joint Detection', 'Location','NorthWest')
     hold off
@@ -293,7 +293,7 @@ for d = 1:num_dist
     plot(bins, cdf, ':r','LineWidth', 2);
     hold on
 
-    ylabel('Percentage (%)', 'FontSize', 16);
+    ylabel('Cumulative Probability', 'FontSize', 16);
     xlabel('Throughputs (bit / RB / sec)', 'FontSize', 16);
     legend('Single-MT','Multi-MT w/o Joint Detection','Multi-MT with Joint Detection', 'Location','NorthWest')
     hold off

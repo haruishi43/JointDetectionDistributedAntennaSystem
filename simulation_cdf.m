@@ -208,7 +208,7 @@ hold on
 cdf = cumsum(counts) / sum(counts);
 plot(bins, cdf,':r','LineWidth', 2);
 hold on
-ylabel('Percentage (%)', 'FontSize', 20);
+ylabel('Cumulative Probability', 'FontSize', 20);
 xlabel('Throughputs (bit / RB / sec)', 'FontSize', 20);
 legend('Single-MT','Multi-MT w/o Joint Detection','Multi-MT with Joint Detection','Location','NorthWest')
 hold off
