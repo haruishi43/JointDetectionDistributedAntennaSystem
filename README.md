@@ -30,7 +30,7 @@ Throughput analysis of the usage of joint maximum likelihood detection (MLD) in 
 
 ### Joint Maximum-Likelihood Detection (Joint-MLD)
 
-![img1]("./Graphs/Screen\ Shot\ 2020-08-14\ at\ 11.18.14.png")
+![img1]("https://github.com/Toraudonn/Switching_BS_Matlab/edit/master/Graphs/Screen\ Shot\ 2020-08-14\ at\ 11.18.14.png")
 
 Joint MLD treats the received signals as the superposition of the desired and the interference signals and regards them as a signal with a larger number of constellation points.
 
